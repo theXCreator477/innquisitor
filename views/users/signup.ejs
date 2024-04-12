@@ -1,0 +1,48 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="container form-container">
+            <form id="user-signup" method="POST" action="/user/signup" novalidate class="needs-validation">
+                <div class="row form-group">
+                    <h2>Create your account</h2>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12 col">
+                        <input id="username" class="form-control" type="text" placeholder="username..." name="username" maxlength="20" required>
+                        <div class="invalid-feedback">Please choose a username</div>
+                    </div>
+                </div>
+                
+                <div class="row form-group">
+                    <div class="col-md-12 col">
+                        <input id="email" class="form-control" type="email" placeholder="email..." name="email" required>
+                        <div class="invalid-feedback">Please enter a valid email</div>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12 col">
+                        <input id="create-pass" autocomplete="off" class="form-control" type="password" placeholder="create new password..." name="password" required>
+                        <div class="invalid-feedback">Please create a strong password</div>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12 col">
+                        <input id="confirm-pass" autocomplete="off" class="form-control" type="password" placeholder="confirm new password..." name="confirm-pass" required>
+                        <div class="invalid-feedback">confirm your password</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <button class="submit-btn" type="submit">Sign Up</button>
+                </div>
+                <div class="row pt-2 text-center">
+                    <a href="/user/login">already have an account? Login Here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/JavaScript/formValidation.js"></script>
+</body>

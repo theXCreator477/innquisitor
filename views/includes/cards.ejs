@@ -1,0 +1,45 @@
+<% for (let i = list.length - 1; i >= 0; i--) { %>
+    <div class="card-body">
+        <a id="show" style="display: none;" href="/listing/<%=list[i]._id%>"></a>
+
+        <div class="swiper mySwiper img-container img-swiper">
+            <div class="swiper-wrapper">
+                <% for (let j of list[i].image) { %>
+                    <div class="swiper-slide">
+                        <img class="square-img" src="<%=j.url%>" alt="">
+                    </div>
+                <% } %>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+            
+        <div class="info-container">
+            <h5 class="card-title medium"><%=list[i].title %></h5>
+            <p class="card-description"><%=list[i].description %></p>
+            <p class="card-price medium">&#8377; <%=list[i].price%>/night</p>
+            <div class="location-div medium">
+                <i class="fa-solid fa-location-dot"></i>
+                <p class="location"><%=list[i].location%>, <%=list[i].country%></p>
+            </div>
+        </div>
+        <div class="card-layer"></div>
+    </div>
+<% } %>
+
+
+<!-- HTML FOR LOADING CARD -->
+
+<!-- <div class="card-body loading">
+    <div class="img-container">
+        <div class="square-img loading-placeholder"></div>
+    </div>
+    <div class="info-container">
+        <h5 class="card-title loading-placeholder"></h5>
+        <p class="card-description loading-placeholder"></p>
+        <p class="card-price loading-placeholder"></p>
+        <div class="location-div medium">
+            <p class="location loading-placeholder"></p>
+        </div>
+    </div>
+    <div class="card-layer"></div>
+</div> -->

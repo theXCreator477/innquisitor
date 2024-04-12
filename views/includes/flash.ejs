@@ -1,0 +1,27 @@
+<% if (success.length) { %>
+    <div class="ct-toast">
+        <div class="toast-content">
+            <i class="fas fa-solid fa-check check"></i>
+            <div class="message">
+                <span class="text text-1">Success</span>
+                <span class="text text-2"><%=success%></span>
+            </div>
+        </div>
+        <i class="fa-solid fa-xmark close"></i>
+        <div class="progress"></div>
+    </div>
+<% } %>
+
+<% if (failure.length) { %>
+    <div class="ct-toast">
+        <div class="toast-content">
+            <i class="fa-solid fa-xmark cross"></i>
+            <div class="message">
+                <span class="text text-1">Failed</span>
+                <span class="text text-2"><%=failure%></span>
+            </div>
+        </div>
+        <i class="fa-solid fa-xmark close"></i>
+        <div class="progress error"></div>
+    </div>
+<% } %>

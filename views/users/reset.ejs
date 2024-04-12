@@ -1,0 +1,33 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="container form-container">
+            <form id="user-signup" method="POST" action="/user/reset/<%=resetToken%>" novalidate class="needs-validation">
+                <div class="row form-group">
+                    <h2>Reset Password</h2>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12 col">
+                        <input id="create-pass" autocomplete="off" class="form-control" type="password" placeholder="create new password..." name="password[create]" required>
+                        <div class="invalid-feedback">Please create a strong password</div>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-12 col">
+                        <input id="confirm-pass" autocomplete="off" class="form-control" type="password" placeholder="confirm new password..." name="password[confirm]" required>
+                        <div class="invalid-feedback">confirm your password</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <button class="submit-btn" type="submit">Reset</button>
+                </div>
+        
+            </form>
+        </div>
+    </div>
+
+    <script src="/JavaScript/formValidation.js"></script>
+</body>

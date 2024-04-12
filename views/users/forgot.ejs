@@ -1,0 +1,33 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+    <style>
+        .forgot-label {
+            font-size: 0.75rem;
+            font-style: italic;
+            color: rgb(89, 89, 89);
+        }
+    </style>
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="container form-container">
+            <form id="" method="POST" action="/user/forgot" novalidate class="needs-validation">
+                <div class="row form-group m-0">
+                    <h2>Forgot Password</h2>
+                </div>
+                <div class="row form-group m-0">
+                    <div class="col-md-12 col">
+                        <label class="forgot-label" for="">Enter username/email to get a reset password link on your email</label>
+                        <input id="" class="form-control" type="text" placeholder="username or email..." name="userInfo" maxlength="50" required>
+                        <div class="invalid-feedback">Please enter a valid username or email.</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <button class="submit-btn" type="submit">Get Email</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="/JavaScript/formValidation.js"></script>
+</body>

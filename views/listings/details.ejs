@@ -1,0 +1,200 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+    <script>
+        const mapAccessToken = "<%=process.env.MAP_ACCESS_TOKEN%>";
+        const coordinates = <%-JSON.stringify(data.geometry.coordinates)%>;
+        const ownerID = <%-JSON.stringify(data.owner._id)%>;
+        const markerImg = <%-JSON.stringify(data.image[0].url)%>;
+        let userID;
+        <% if (currentUser) { %>
+            userID = <%- JSON.stringify(currentUser._id) %>;
+        <% } %>
+    </script>
+
+    <% let avgRating = 0 %>
+    <% for (let review of data.reviews) { %>
+        <% avgRating += review.rating %>
+    <% } %>
+    <% avgRating /= data.reviews.length || 1 %>
+    <div class="details-body">
+        <div class="div-1">
+
+            <div class="swiper mySwiper img-container details-img img-swiper">
+                <div class="swiper-wrapper">
+                    <% for (let j of data.image) { %>
+                        <div class="swiper-slide">
+                            <img class="square-img" src="<%=j.url%>" alt="">
+                        </div>
+                    <% } %>
+                </div>
+
+                <div class="edit-delete-div">
+                    <a href="/listing/<%=data._id%>/edit">
+                        <button class="submit-btn edit-delete-btn">
+                            Edit
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </a>
+                    <form method="POST" action="/listing/<%=data._id%>?_method=DELETE">
+                        <button id="delete-btn" type="submit" class="submit-btn edit-delete-btn">
+                            Delete
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="swiper-button-next swiper-btn">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="swiper-button-prev swiper-btn">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+
+            <h3 class="title medium"><%=data.title%></h3>
+            <p class="description"><%=data.description%></p>
+            <p class="location medium"><i class="fa-solid fa-location-dot"></i>&nbsp;at <%=data.location%>, <%=data.country%></p>
+            <div class="d-flex justify-content-between">
+                <div class="d-flex gap-2 opacity-75">
+                    <p>
+                        <%= avgRating.toFixed(1) %>
+                        <i class="fa-solid fa-star"></i>
+                    </p>
+                    &#x2022;
+                    <p>
+                       <%=data.reviews.length%> Reviews 
+                    </p>
+                </div>
+                <div class="opacity-75">
+                    <i class="details-owner">Listed by- <%= data.owner.username %></i>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="div-2">
+
+            <div class="price-card">
+                <div class="price">
+                    <h3> &#8377; <strike><%=(data.price*1.4).toLocaleString("en-IN")%></strike>&nbsp;<%=data.price.toLocaleString("en-IN")%></h3>
+                    <p>/night &nbsp;</p>
+                    <p class="discount">40% OFF</p>
+                </div>
+                <div class="check-div">
+                    <div class="check-in-out">
+                        <div class="check-in">
+                            <p>CHECK-IN</p>
+                            <p>3/10/2024</p>
+                        </div>
+                        <div class="check-out">
+                            <p>CHECK-OUT</p>
+                            <p>3/15/2024</p>
+                        </div>
+                    </div>
+                    <div class="guests">
+                        <p>GUESTS</p>
+                        <p>1 guest</p>
+                    </div>
+                </div>
+                <button class="submit-btn reserve-btn">Reserve</button>
+            </div>    
+
+            <form id="review-form" method="post" novalidate class="needs-validation" action="/listing/<%=data._id%>/review">
+                <div class="review-container mt-3">
+                    <div class="review">
+                        <textarea class="form-control" required name="review[comment]" id="comment" cols="" rows="" placeholder="Your Review/Feedback matters..." minlength="10"></textarea>
+                        <div class="invalid-feedback" id="invalid-feedback-2">Review must be atleast 10 characters.</div>
+                    </div>
+                </div>
+                <div class="rating">
+                    <%-include("../includes/ratings")%>
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <hr class="hr-line review-separator">
+
+    <h3 class="reviews-heading medium">Our Reviews-</h3>
+
+    <div class="all-reviews">
+        
+        <% for (let review of data.reviews) { %>
+            <div class="review-card">
+                <h5 class="hidden-rating" style="display: none;"><%=review.rating%></h5>
+                <h5 class="card-id" style="display: none;">id-<%=review._id%></h5>
+                <div class="review-header">
+                    <div class="review-owner">
+                        <div class="review-img">
+                            <img src="<%= review.owner.profilePic %>" alt="">
+                        </div>
+                        <p class="username medium m-0"><%= review.owner.username %></p>
+                    </div>
+                    <% if (currentUser) { %>
+                        <form method="POST" action="/listing/<%=data._id%>/review/<%=review._id%>?_method=DELETE">
+                            <button type="submit" class="">
+                                <i id="delete-review" class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    <% } %>
+                </div>
+                <div class="user[container-wrapper]">
+                    <div class="user[rating-bubble]">
+                      <div class="row justify-content-center">
+                        <div class="user[rating-wrapper] d-flex justify-content-center align-items-center">
+                
+                          <input disabled type="radio" id="id-<%=review._id%>-5-star" name="rating-<%=review._id%>" value="5">
+                          <label for="id-<%=review._id%>-5-star" class="user[star-rating]">
+                            <i class="fas fa-star d-inline-block"></i>
+                          </label>
+                
+                          <input disabled type="radio" id="id-<%=review._id%>-4-star" name="rating-<%=review._id%>" value="4">
+                          <label for="id-<%=review._id%>-4-star" class="user[star-rating] user[star]">
+                            <i class="fas fa-star d-inline-block"></i>
+                          </label>
+                
+                          <input disabled type="radio" id="id-<%=review._id%>-3-star" name="rating-<%=review._id%>" value="3">
+                          <label for="id-<%=review._id%>-3-star" class="user[star-rating] user[star]">
+                            <i class="fas fa-star d-inline-block"></i>
+                          </label>
+                
+                          <input disabled type="radio" id="id-<%=review._id%>-2-star" name="rating-<%=review._id%>" value="2">
+                          <label for="id-<%=review._id%>-2-star" class="user[star-rating] user[star]">
+                            <i class="fas fa-star d-inline-block"></i>
+                          </label>
+                
+                          <input disabled type="radio" id="id-<%=review._id%>-1-star" name="rating-<%=review._id%>" value="1">
+                          <label for="id-<%=review._id%>-1-star" class="user[star-rating] user[star]">
+                            <i class="fas fa-star d-inline-block"></i>
+                          </label>
+                
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <p class="thin"><%=review.comment%></p>
+            </div>
+        <% } %>
+
+    </div>
+
+    <hr class="hr-line mt-2 mb-2">
+
+    <div class="map-container d-flex flex-column align-items-center gap-4">
+        <h3 class="medium m-0">Where you will be...</h3>
+        <div id="map"></div>
+    </div>
+
+    <!-- SWIPER SCRIPT -->
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- CUSTOM SCRIPT -->
+
+    <script src="/JavaScript/formValidation.js"></script>
+    <script src="/JavaScript/details.js"></script>
+
+</body>

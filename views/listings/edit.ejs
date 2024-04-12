@@ -1,0 +1,62 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+    <div class="edit-body-container">
+        <div class="edit-body">
+            <div class="img-container edit-form-img"> 
+                <img class="square-img" src="<%=data.image[0].url%>" alt="">
+            </div>
+            <div class="container form-container edit-form-container">
+                <form method="POST" action="/listing/<%=data._id%>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
+                    <div class="row form-group">
+                        <h2>Edit the Details</h2>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col">
+                            <input id="title" class="form-control" type="text" placeholder="Hotel Name..." value="<%=data.title%>" name="listing[title]" maxlength="50" required>
+                            <div class="invalid-feedback">Please choose a title</div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col">
+                            <textarea id="description" class="form-control" rows="" cols="" placeholder="Description..." name="listing[description]" minlength="50" maxlength="1000"><%=data.description%></textarea>
+                            <div class="invalid-feedback">Description must be 50-1000 characters</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col">
+                            <input class="form-control" id="img" type="file" name="listing[image]" multiple>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col">
+                            <input class="form-control" type="number" name="listing[price]" value="<%=data.price%>" placeholder="Price per night..." required min="1000">
+                            <div class="invalid-feedback">Please set a valid price</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col">
+                            <input class="form-control" type="text" name="listing[location]" value="<%=data.location%>" placeholder="City/Town..." required>
+                            <div class="invalid-feedback">Please enter a valid city</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col">                    
+                            <input class="form-control" value="<%=data.country%>" type="text" name="listing[country]" placeholder="Country..." required>
+                            <div class="invalid-feedback">Please enter a valid country</div>
+                        </div>
+                    </div>
+                    <div>
+                        <input style="display: none;" type="text" name="listing[category]" value="<%=data.category%>">
+                    </div>
+                    <div class="row">
+                        <button class="submit-btn" type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/JavaScript/formValidation.js"></script>
+    
+</body>

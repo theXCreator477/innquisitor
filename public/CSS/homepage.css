@@ -1,0 +1,291 @@
+.img-container {
+    aspect-ratio: 1/1;
+    position: relative;
+    z-index: -1;
+}
+
+.square-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+    position: relative;
+    z-index: 50;
+}
+
+.cards-container {
+    display: grid;
+    padding: 1rem 2.5rem;
+    gap: 1rem;
+    place-items: center;
+    border-top: 1px solid #e2e2e2;
+}
+
+.cards-container * {
+    margin: 0;
+    padding: 0;
+}
+
+.info-container > * {
+    margin: 0.5rem 0;
+}
+
+@media (min-width: 1128px) {
+    .cards-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .card-body {
+        max-width: 20vw;
+        height: auto;
+    }
+}
+
+@media (min-width: 950px) and (max-width: 1127.99px) {
+    .cards-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .card-body {
+        max-width: 27vw;
+        height: auto;
+    }
+}
+
+@media (max-width: 949.99px) {
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card-body {
+        max-width: 40vw;
+        height: auto;
+    }
+}
+
+@media (max-width: 549.99px) {
+    .cards-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .card-body {
+        max-width: 80vw;
+        height: auto;
+    }
+}
+
+.card-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 1.2em;
+}
+
+.location {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.card-description {
+    font-size: 0.8em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.location-div {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body {
+    position: relative;
+    padding: 1rem;
+}
+
+.card-layer {
+    position: absolute;
+    border-radius: 1rem;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: black;
+    color: black;
+    font-size: 30px;
+    text-align: center;
+    opacity: 0;
+    transition: all 0.1s ease-in;
+}
+
+.card-layer:hover {
+    opacity: 0.1;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    width: 50vw;
+    position: relative;
+}
+
+.search-input {
+    border: none;
+    box-shadow: 7px 7px 25px rgba(198, 206, 237, 0.7), -7px -7px 5px rgba(255, 255, 255, 0.7), inset 0px 0px 4px rgba(255, 255, 255, 0.9), inset 7px 7px 15px rgba(198, 206, 237, 0.8);
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    outline: none;
+    border-radius: 2rem;
+    position: relative;
+    z-index: 50;
+  }
+  
+  .search-icon {
+    font-size: 1.5em;
+    color: grey;
+    opacity: 0.9;
+    position: absolute;
+    z-index: 51;
+    padding: 0 1rem;
+  }
+  
+  .search-btn {
+    /* position: absolute; */
+    margin-left: -2rem;
+    border: none;
+    background-color: #FF385C;
+    color: white;
+    height: 45px;
+    border-radius: 2rem;
+    padding: 0 1.5rem 0 3rem;
+  }
+
+
+/* CATEGORY FILTERS STYLES */
+
+.filter-options {
+    opacity: 0.75;
+    border-bottom: 2px solid #F7F7F7;
+    transition: 0.2s ease-in;
+}
+
+label:has(input:checked) {
+    opacity: 1;
+    border-color: black;
+}
+
+.filter-options input {
+    display: none;
+}
+
+.filter-options img {
+    height: 1.5rem;
+    width: 1.5rem;
+    opacity: 0.8;
+    display: block;
+    margin: auto;
+}
+
+.filter-options:hover {
+    opacity: 1;
+}
+
+.filters-container {
+    font-size: 0.85rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+
+/* STYLING FOR LOADING INTERFACE OF CARD */
+
+
+.loading {
+    position: relative;
+    overflow: hidden;
+    width: 300px;
+
+}
+
+.loading-placeholder {
+    background-color: #ded4d4;
+    border-radius: 1rem;
+    margin: 5px 0;
+    animation: loading 1s infinite ease-in-out;
+}
+
+@keyframes loading {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.square-img.loading-placeholder {
+    height: 200px;
+}
+
+.card-title.loading-placeholder {
+    width: 50%;
+    height: 20px;
+}
+
+.card-description.loading-placeholder {
+    width: 100%;
+    height: 20px;
+}
+
+.card-price.loading-placeholder {
+    width: 30%;
+    height: 20px;
+}
+
+.location.loading-placeholder {
+    width: 50%;
+    height: 20px;
+}
+
+/* SWIPER STYLES */
+
+.f-swiper {
+    width: 70vw;
+    text-align: center;
+}
+
+.swiper-btn::after {
+    display: none;
+}
+
+.swiper-btn i {
+    font-size: 1.1rem;
+    border-radius: 50%;
+    padding: 10px 15px;
+    color: #8C8C8C;
+    background-color: #fff;
+    box-shadow: inset 1px 1px 5px rgba(198, 206, 237, 0.8), inset -1px -1px 5px rgba(198, 206, 237, 0.8), 1px 1px 2px, -1px -1px 2px;
+}
+
+
+
+/* SWIPER SLIDE FOR IMAGE STYLES */
+
+.swiper-pagination-bullet {
+    background-color: white;
+    opacity: 0.75;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: rgb(99, 174, 255);
+    opacity: 1;
+}

@@ -1,0 +1,27 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+    <script>
+        const data = <%-JSON.stringify(list)%>
+    </script>
+    <div class="mt-4 d-flex justify-content-center">
+        <div class="sb-container">
+            <div class="search-bar">
+                <i class="search-icon fa-solid fa-magnifying-glass"></i>
+                <input class="search-input" type="search" placeholder="Search Destination..." aria-label="Search">
+                <button class="search-btn" type="button">Search</button>
+            </div>
+        </div>
+    </div>
+    <%-include("../includes/filters")%>
+    <div class="cards-container">
+        <%-include("../includes/cards")%>
+    </div>
+
+    <!-- SWIPER SCRIPT -->
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- CUSTOM SCRIPTS -->
+    
+    <script src="../../JavaScript/homepage.js"></script>
+</body>

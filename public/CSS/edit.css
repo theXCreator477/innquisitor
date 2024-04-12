@@ -1,0 +1,44 @@
+/* Form Stylings are same for new.css and edit.css */
+/* Here are only some additional stylings */
+
+.edit-form-container {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 264px;
+    max-width: none;
+    flex-grow: 1;
+    box-shadow: none;
+}
+
+.edit-body {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    border: 1px solid rgb(180, 180, 180);
+    box-shadow: inset -2px -2px 10px rgba(177, 174, 174, 0.4), inset 2px 2px 10px rgba(177, 174, 174, 0.4), -2px -2px 10px rgba(177, 174, 174, 0.4), 2px 2px 10px rgba(177, 174, 174, 0.4);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    margin: 2rem;
+}
+
+.edit-body * {
+    margin: 0;
+}
+
+.edit-form-img {
+    width: 550px;
+    height: 450px;
+}
+
+.edit-body-container {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 1150px) {
+    .edit-body {
+        flex-direction: column;
+    }
+}
