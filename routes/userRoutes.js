@@ -23,4 +23,6 @@ router.route("/reset/:resetToken")
 
 router.get("/logout", isLoggedIn, UserControllers.logout);
 
+router.get("/bookings", isLoggedIn, asyncWrap(UserControllers.renderBookings));
+
 module.exports = router;

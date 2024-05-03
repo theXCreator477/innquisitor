@@ -152,4 +152,47 @@
         padding-bottom: 2rem;
     }
 
+    .reserve-container {
+        flex-direction: column;
+        padding: 2rem 1rem;
+
+        .reserve-card {
+            min-width: 90vw;
+            border: none;
+            padding: 0;
+        }
+
+        .landscape-btn {
+            display: none;
+        }
+
+        .portrait {
+            align-self: center;
+        }
+    }
+
+    .reserve-portrait-btn {
+        width: 80vw;
+    }
+
+    .bookings-container {
+        .reserve-card {
+            border: 1px solid rgba(128, 128, 128, 0.25);
+            padding: 1rem;
+        }
+    }
+
+    .dot {
+        right: -12px;
+    }
+
+}
+
+@media (min-width: 576px) {
+    .e-daterangepicker {
+        position: fixed !important;
+        left: 50% !important;
+        top: 50vh !important;
+        transform: translate(-50%, -50%) !important;
+    }
 }

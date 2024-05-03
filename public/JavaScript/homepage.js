@@ -168,6 +168,7 @@ document.querySelectorAll('.filters-container input').forEach(input => {
 
 document.querySelector('.search-btn').addEventListener('click', (event) => {
     let searchInput = document.querySelector('.search-input').value.toUpperCase();
+
     if (searchInput) {
         let tempList = listCpy.filter(list => {
             let destination = `${list.location.toUpperCase()} ${list.country.toUpperCase()} ${list.title.toUpperCase()}`.trim();

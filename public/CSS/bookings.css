@@ -1,0 +1,14 @@
+/* MAXIMUM STYLES ARE APPLYING FROM RESERVE.CSS */
+
+.bookings-container {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .reserve-card {
+        width: calc(100vw - 7rem);
+    }
+
+    h4:not(.title) {
+        font-size: 1.1rem;
+    }
+}

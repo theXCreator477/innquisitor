@@ -5,6 +5,8 @@
         const coordinates = <%-JSON.stringify(data.geometry.coordinates)%>;
         const ownerID = <%-JSON.stringify(data.owner._id)%>;
         const markerImg = <%-JSON.stringify(data.image[0].url)%>;
+        const reservedDates = <%-JSON.stringify(data.reservedDates)%>;
+        const listingID = <%-JSON.stringify(data._id)%>;
         let userID;
         <% if (currentUser) { %>
             userID = <%- JSON.stringify(currentUser._id) %>;
@@ -85,11 +87,14 @@
                     <div class="check-in-out">
                         <div class="check-in">
                             <p>CHECK-IN</p>
-                            <p>3/10/2024</p>
+                            <p id="checkin-date">--/--/----</p>
                         </div>
                         <div class="check-out">
-                            <p>CHECK-OUT</p>
-                            <p>3/15/2024</p>
+                            <div>
+                                <p>CHECK-OUT</p>
+                                <p id="checkout-date">--/--/----</p>
+                            </div>
+                            <i class="fa-regular fa-calendar-days"></i>
                         </div>
                     </div>
                     <div class="guests">
@@ -97,7 +102,16 @@
                         <p>1 guest</p>
                     </div>
                 </div>
-                <button class="submit-btn reserve-btn">Reserve</button>
+                
+                <form id="reserve-form" method="post" action="/listing/<%=data._id%>/reserve">
+                    <input type="hidden" name="selectedDates">
+                    <button class="submit-btn reserve-btn" id="reserve-btn" type="submit">Reserve</button>
+                </form>
+
+                <div id="container" style="display: none;">
+                    <input id="element" type="text">
+                    
+                </div>
             </div>    
 
             <form id="review-form" method="post" novalidate class="needs-validation" action="/listing/<%=data._id%>/review">
@@ -188,9 +202,21 @@
         <div id="map"></div>
     </div>
 
+
+    <div class="e-device e-daterangepicker e-range-modal" style="visibility: hidden; z-index: 1030;"></div>
+
     <!-- SWIPER SCRIPT -->
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- SYNCFUSION SCRIPTS -->
+
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <script src="https://cdn.syncfusion.com/ej2/ej2-calendars/dist/ej2-calendars.min.js"></script>
+
+    <!-- AXIOS CDN SCRIPT -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js" integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!-- CUSTOM SCRIPT -->
 

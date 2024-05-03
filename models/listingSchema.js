@@ -48,6 +48,7 @@ const listingSchema = new Schema({
         }
     },
     category: String, 
+    reservedDates: [String],
 });
 
 listingSchema.post("findOneAndDelete", async (listing) => {

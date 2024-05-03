@@ -54,6 +54,16 @@
 
 .check-out {
   flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .fa-calendar-days {
+    font-size: 1.25rem;
+    opacity: 0.8;
+    cursor: pointer;
+  }
 }
 
 .check-in-out>* {
@@ -128,6 +138,10 @@
 .discount {
   color: #FF385C;
   font-size: 0.75em;
+}
+
+#reserve-btn {
+  width: 100%;
 }
 
 
@@ -344,4 +358,17 @@
 
 .mapboxgl-popup {
   max-width: 200px;
+}
+
+
+/* CALENDAR STYLES */
+
+.e-daterangepicker {
+  z-index: 1031 !important;
+}
+
+.e-daterangepicker.e-popup,
+.e-range-header,
+.e-footer {
+  border-radius: 1.5rem !important;
 }

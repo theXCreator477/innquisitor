@@ -1,0 +1,51 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+
+    <script>
+        let reservations = <%-JSON.stringify(user.reservations)%>;
+    </script>
+
+    <div class="reserve-container bookings-container">
+        <div class="">
+
+            <div class="req-head-cont">
+                <a href="/listing">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h2 class="bookings-heading medium">Your bookings</h2>
+            </div>
+
+        </div>
+
+        <% for (let reserve of user.reservations ) { %>
+            <div class="reserve-card">
+                <div class="reserve-head">
+                    <div class="reserve-card-img">
+                        <img src="<%=reserve.listing.image[0].url%>" alt="">
+                    </div>
+                    <div class="">
+                        <h4 class="title"><%=reserve.listing.title%></h4>
+                    </div>
+                </div>
+    
+                <hr>
+    
+                <div>
+                    <h4>Your trip</h4>
+                    <p><%=reserve.dates[0]%> - <%=reserve.dates[reserve.dates.length - 1]%></p>
+                </div>
+    
+                <hr>
+    
+                <div class="reserve-total">
+                    <p>Amount Paid: </p>
+                    <p>&#8377; <%=reserve.amount.toLocaleString("en-IN")%></p>
+                </div>
+            </div>
+        <% } %>
+       
+    </div>
+
+    <script src="/JavaScript/bookings.js"></script>
+
+</body>

@@ -30,7 +30,7 @@ try {
     }
   });
 
-} catch (err) {console.log("ERROR AA GYA: ", err)}
+} catch (err) {}
 
 
 try {
@@ -42,7 +42,7 @@ try {
     }
   });
 
-} catch (err) {console.log("ERROR AA GYA 2: ", err)}
+} catch (err) {}
 
 
 try {
@@ -66,10 +66,5 @@ try {
       }
     }
   });
-
-} catch (err) {console.log("ERROR AA GYA 3: ", err)}
-
-
-try {
 
 } catch (err) {}

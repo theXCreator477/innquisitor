@@ -1,0 +1,77 @@
+<%layout("layouts/boilerPlate")-%>
+<body>
+
+    <div class="reserve-container">
+        <div class="">
+
+            <div class="req-head-cont">
+                <a href="/listing/<%=listing._id%>">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h2 class="medium">Request to book</h2>
+            </div>
+
+            <hr>
+
+            <h4>Your trip</h4>
+            <p><%=selectedDates[0]%> - <%=selectedDates[selectedDates.length - 1]%></p>
+
+            <hr>
+
+            <h4>Ground rules</h4>
+            <p>We ask every guest to remember a few simple things about what makes them a great guest</p>
+            <p>&#x2022; Follow the house rules</p>
+            <p>&#x2022; Treat your host's home like your own</p>
+
+            <hr>
+
+            <p class="note"><b>Your reservation won't be confirmed until the host approves your request.</b><i>(You won't be charged until then)</i></p>
+
+            <form method="post" class="landscape-btn" action="/listing/<%=listing._id%>/reserve/request">
+                <button class="submit-btn" type="submit">Request to book</button>
+            </form>
+        </div>
+
+        <div class="reserve-card">
+            <div class="reserve-head">
+                <div class="reserve-card-img">
+                    <img src="<%=listing.image[0].url%>" alt="">
+                </div>
+                <div class="">
+                    <h4><%=listing.title%></h4>
+                </div>
+            </div>
+
+            <hr>
+
+            <h4>Price breakup:</h4>
+            <div class="price-breakup">
+                <div>
+                    <p><%=listing.price%> x <%=selectedDates.length%> nights</p>
+                    <p>&#8377; <%=(listing.price * selectedDates.length).toLocaleString("en-IN")%></p>
+                </div>
+                <div>
+                    <p>Taxes(18%)</p>
+                    <p>&#8377; <%=parseFloat((listing.price * selectedDates.length * 0.18).toFixed(2)).toLocaleString("en-IN")%></p>
+                </div>
+                <div>
+                    <p>InnQuisitor service fee(3%)</p>
+                    <p>&#8377; <%=parseFloat((listing.price * selectedDates.length * 0.03).toFixed(2)).toLocaleString("en-IN")%></p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="reserve-total">
+                <p>Total(INR)</p>
+                <p>&#8377; <%=parseFloat(((listing.price * selectedDates.length * 0.21) + (listing.price * selectedDates.length)).toFixed(2)).toLocaleString("en-IN")%></p>
+            </div>
+        </div>
+
+        <form method="post" class="portrait" action="/listing/<%=listing._id%>/reserve/request">
+            <button class="submit-btn reserve-portrait-btn" type="submit">Request to book</button>
+        </form>
+
+    </div>
+
+</body>

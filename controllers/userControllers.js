@@ -30,10 +30,52 @@ module.exports.signup = async (req, res, next) => {
 
     try {
         let registeredUser = await User.register(newUser, password);
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.GMAIL_APP_USER,
+                pass: process.env.GMAIL_APP_PASS
+            }
+        });
+    
+        const mailOptions = {
+            from: {
+                name: 'InnQuisitor',
+                address: process.env.GMAIL_APP_USER
+            },
+            to: email,
+            subject: `Welcome ${username}, Discover Your Perfect Stay with InnQuisitor`,
+            html: `<body>
+                        <table cellpadding="0" cellspacing="0" style="width: 80vw; max-width: 500px; background-color: #F7F7F7; margin: auto; border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 1rem; padding: 1rem;">
+                            <tr>
+                                <td align="center" style="padding: 0.25rem;">
+                                    <img src="https://res.cloudinary.com/dhqqljnt3/image/upload/v1714725885/20240418_203344_ue48dt.png"
+                                        height="80" style="height: 80px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>
+                                        Dear ${username},<br><br>
+                                        We are delighted to welcome you to InnQuisitor, the premier hotel booking platform for discerning travelers. Our tagline, "Discover Your Perfect Stay," is not just a slogan, it's a promise we make to every one of our valued users.<br><br>Our platform is designed to provide you with a seamless and intuitive booking experience, so you can focus on what matters most - creating unforgettable memories.<br><br>Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </body>`,
+        }
+        
+        try {
+            await transporter.sendMail(mailOptions);
+        } catch (err) {
+            console.log(err);
+        }
+
         req.login(registeredUser, (err) => {
             if (err) return next(err);
             else {
-                req.flash("success", "Welcome to AirBnB. Book your next adventure now!");
+                req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
                 res.redirect("/listing");
             }
         });
@@ -50,7 +92,7 @@ module.exports.renderLoginForm = (req, res) => {
 module.exports.login = (req, res) => {
     let {url, method} = res.locals.redirectInfo || {};
     let redirectUrl = url || "/listing";
-    req.flash("success", "Welcome to AirBnB. Book your next adventure now!");
+    req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
     if (method && method !== 'GET') res.redirect(307, redirectUrl);
     else res.redirect(redirectUrl);
 };
@@ -104,17 +146,48 @@ module.exports.submitForgot = async (req, res) => {
 
     const mailOptions = {
         from: {
-            name: 'BnB Bookings',
+            name: 'InnQuisitor Support',
             address: process.env.GMAIL_APP_USER
         },
         to: user.email,
         subject: 'Password Reset Request',
-        html: `Hello ${user.username},<br><br>
-         We have received a password reset request for your account.<br>
-         If you did not request this, please ignore this email.<br><br>
-         To reset your password, please <a href="${req.protocol}://${req.headers.host}/user/reset/${resetToken}">click here</a><br><br>
-         This link will expire in 5 minutes.<br><br>
-         Best regards,<br>BnB Bookings`
+        html: `<body>
+                    <table cellpadding="0" cellspacing="0" style="width: 80vw; max-width: 500px; background-color: #F7F7F7; margin: auto; border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 1rem; padding: 1rem;">
+                        <tr>
+                            <td align="center" style="padding: 1rem;">
+                                <img src="https://res.cloudinary.com/dhqqljnt3/image/upload/v1714725885/20240418_203344_ue48dt.png"
+                                    height="80" style="height: 80px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>
+                                    Hello ${user.username},<br><br>
+                                    We have received a password reset request for your account.<br>
+                                    If you did not request this, please ignore this email.<br><br>
+                                    To reset your password, please click the button below:
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <button type="button"
+                                    style="border: none; border-radius: 0.5rem; background-color: #FF385C; padding: 0.75rem 1.5rem; font-size: 1rem; margin: 0.5rem auto;">
+                                    <a href="${req.protocol}://${req.headers.host}/user/reset/${resetToken}" style="text-decoration: none; color: white;">Reset Password</a>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>
+                                    This link will expire in 5 minutes.<br><br>
+                                    Best regards,<br>
+                                    InnQuisitor Team
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </body>`
     }
 
     try {
@@ -196,3 +269,8 @@ module.exports.submitReset = async (req, res) => {
         res.redirect(`/user/reset/${resetToken}`);
     }
 };
+
+module.exports.renderBookings = async (req, res) => {
+    const user = await req.user.populate({path: "reservations", populate: {path: "listing"}});
+    res.render("listings/bookings", {user});
+}

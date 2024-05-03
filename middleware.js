@@ -1,5 +1,6 @@
 const Listing = require("./models/listingSchema");
 const {reviewSchema, listingSchema} = require("./schemaValidation");
+const User = require("./models/userSchema");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -46,4 +47,15 @@ module.exports.validateListing = (req, res, next) => {
         req.flash("error", errorMsg);
         res.redirect(`/listing`);
     } else next();
+};
+
+module.exports.validateToken = async (req, res, next) => {
+    let reqToken = req.params.reqToken;
+    const user = await User.findOne({reqToken, reqTokenExpiration: {$gt: Date.now()}});
+
+    if (!user) {
+        req.flash("error", "Token Expired");
+        return res.redirect("/listing");
+    }
+    next();
 };

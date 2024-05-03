@@ -1,0 +1,96 @@
+.reserve-container {
+    padding: 3rem;
+    display: flex;
+    gap: 2rem;    
+    align-items: center;
+
+    p {
+        font-size: 0.9rem;
+        opacity: 0.75;
+    }
+
+    a {
+        all: unset;
+    }
+
+    .note {
+        opacity: 1;
+        /* font-weight: bold; */
+    }
+
+    hr {
+        opacity: 0.15 !important;
+    }
+
+    .req-head-cont {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .fa-arrow-left {
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        margin-bottom: 4px;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+    .fa-arrow-left:hover {
+        background-color: rgba(128, 128, 128, 0.25);
+    }
+}
+
+.reserve-card {
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    min-width: 400px;
+    height: fit-content;
+    border-radius: 1rem;
+    gap: 1rem;
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .reserve-head {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .price-breakup {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        > * {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    .reserve-total {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        
+        p {
+            opacity: 1;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+    }
+
+    img {
+        height: 100px;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        border: none;
+        border-radius: 1rem;
+    }
+
+}
