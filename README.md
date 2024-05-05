@@ -2,6 +2,16 @@
 
 Welcome to our Hotel Booking Website! This project is a full-stack web application that allows users to browse, book, and manage hotel listings. The website includes features such as user authentication, hotel listings management, reservation requests, and payment processing.
 
+
+## Demo
+
+Check out our live demo at [Hotel Booking Website](https://innquisitor.onrender.com).
+
+## Project Video
+
+Watch our project video at [Project Video](https://youtu.be/tvMy1AiOZxI?si=Rkl6r_ds9yUvJv_f).
+
+
 ## Features
 
 - **User Authentication:**
@@ -30,14 +40,6 @@ Welcome to our Hotel Booking Website! This project is a full-stack web applicati
 - **Razorpay:** Payment gateway.
 - **Syncfusion:** Calendar integration.
 - Other libraries: `connect-flash`, `connect-mongo`, `cookie-parser`, `dotenv`, `ejs`, `ejs-mate`, `express-session`, `joi`, `method-override`, `multer`, `multer-storage-cloudinary`.
-
-## Demo
-
-Check out our live demo at [Hotel Booking Website](https://innquisitor.onrender.com).
-
-## Project Video
-
-Watch our project video at [Project Video](https://youtu.be/tvMy1AiOZxI?si=Rkl6r_ds9yUvJv_f).
 
 ## Getting Started
 
