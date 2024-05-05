@@ -9,6 +9,8 @@ router.route("/signup")
     .get(UserControllers.renderSignupForm)
     .post(asyncWrap(UserControllers.signup));
 
+router.get("/verify/:token", asyncWrap(UserControllers.verify));
+
 router.route("/login")
     .get(UserControllers.renderLoginForm)
     .post(saveRedirectInfo, passport.authenticate("local", {failureRedirect: "/user/login", failureFlash: true}), UserControllers.login);

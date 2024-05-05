@@ -1,5 +1,6 @@
 const User = require("../models/userSchema");
 const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup");
@@ -25,11 +26,17 @@ module.exports.signup = async (req, res, next) => {
         return;
     }
 
-    let profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`; 
-    let newUser = new User({username, email, profilePic});
-
     try {
-        let registeredUser = await User.register(newUser, password);
+        let verifyToken = crypto.randomBytes(16).toString("hex");
+
+        req.session.user = {
+            username,
+            email,
+            password,
+            verifyToken
+        };
+
+        await req.session.save();
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -58,7 +65,22 @@ module.exports.signup = async (req, res, next) => {
                                 <td>
                                     <p>
                                         Dear ${username},<br><br>
-                                        We are delighted to welcome you to InnQuisitor, the premier hotel booking platform for discerning travelers. Our tagline, "Discover Your Perfect Stay," is not just a slogan, it's a promise we make to every one of our valued users.<br><br>Our platform is designed to provide you with a seamless and intuitive booking experience, so you can focus on what matters most - creating unforgettable memories.<br><br>Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
+                                        We are delighted to welcome you to InnQuisitor, the premier hotel booking platform for discerning travelers. Our tagline, "Discover Your Perfect Stay," is not just a slogan, it's a promise we make to every one of our valued users.<br><br>Our platform is designed to provide you with a seamless and intuitive booking experience, so you can focus on what matters most - creating unforgettable memories.
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <button type="button"
+                                        style="border: none; border-radius: 0.5rem; background-color: #FF385C; padding: 0.75rem 1.5rem; font-size: 1rem; margin: 0.5rem auto;">
+                                        <a href="${req.protocol}://${req.headers.host}/user/verify/${verifyToken}" style="text-decoration: none; color: white;">Verify Email</a>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>
+                                        Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
                                     </p>
                                 </td>
                             </tr>
@@ -66,12 +88,37 @@ module.exports.signup = async (req, res, next) => {
                     </body>`,
         }
         
-        try {
-            await transporter.sendMail(mailOptions);
-        } catch (err) {
-            console.log(err);
-        }
+        await transporter.sendMail(mailOptions);
 
+        req.flash("success", "A verification email has been sent to your email address. Please click the link to activate your account");
+        req.redirect("/listing");
+        
+    } catch (err) {
+        req.flash("error", err.message);
+        res.redirect("/listing");
+    }
+};
+
+module.exports.verify = async (req, res) => {
+    const {token} = req.params;
+
+    if (!req.session.user) {
+        req.flash("error", "Session Expired");
+        return res.redirect("/listing");
+    }
+
+    const {username, email, password, verifyToken} = req.session.user;
+    
+    if (verifyToken !== token) {
+        req.flash("error", "Invalid Token");
+        return res.redirect("/listing");
+    }
+
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`; 
+    const newUser = new User({username, email, profilePic});
+
+    try {
+        let registeredUser = await User.register(newUser, password);
         req.login(registeredUser, (err) => {
             if (err) return next(err);
             else {
@@ -81,7 +128,7 @@ module.exports.signup = async (req, res, next) => {
         });
     } catch (err) {
         req.flash("error", err.message);
-        res.redirect("/user/signup");
+        res.redirect("/listing");
     }
 };
 
