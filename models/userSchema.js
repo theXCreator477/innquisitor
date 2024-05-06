@@ -18,6 +18,7 @@ const userSchema = new Schema({
     },
     profilePic: {
         type: String,
+        required: true,
     },
     resetToken: String,
     resetTokenExpiration: Date,

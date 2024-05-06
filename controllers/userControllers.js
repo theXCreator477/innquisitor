@@ -1,4 +1,5 @@
 const User = require("../models/userSchema");
+const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
@@ -8,6 +9,7 @@ module.exports.renderSignupForm = (req, res) => {
 
 module.exports.signup = async (req, res, next) => {
     let {username, email, password} = req.body;
+    const regexp = new RegExp('^[a-zA-Z0-9]+(\\s[a-zA-Z0-9]+)?$');
 
     if (!email || !username || !password) {
         req.flash('error', 'All fields are required');
@@ -16,10 +18,20 @@ module.exports.signup = async (req, res, next) => {
     }
 
     username = username.trim();
+    if (!regexp.test(username)) {
+        req.flash('error', 'Username can only contain letters and numbers');
+        return res.redirect('/signup');
+    }
     email = email.trim();
     password = password.trim();
 
-    const existingUser = await User.findOne({ email });
+    let existingUser = await User.findOne({ username });
+    if (existingUser) {
+        req.flash('error', 'This username is not available');
+        res.redirect('/user/signup');
+        return;
+    }
+    existingUser = await User.findOne({ email });
     if (existingUser) {
         req.flash('error', 'Email address already in use');
         res.redirect('/user/signup');
@@ -27,16 +39,10 @@ module.exports.signup = async (req, res, next) => {
     }
 
     try {
-        let verifyToken = crypto.randomBytes(16).toString("hex");
+        const verifyToken = crypto.randomBytes(16).toString("hex");
 
-        req.session.user = {
-            username,
-            email,
-            password,
-            verifyToken
-        };
-
-        await req.session.save();
+        const user = new PendingUser({username, email, password, verifyToken, expiresAt: Date.now() + 30 * 60 * 1000});
+        await user.save();
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -80,7 +86,7 @@ module.exports.signup = async (req, res, next) => {
                             <tr>
                                 <td>
                                     <p>
-                                        Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
+                                        Link is valid for 30 minutes.<br><br>Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
                                     </p>
                                 </td>
                             </tr>
@@ -102,23 +108,24 @@ module.exports.signup = async (req, res, next) => {
 module.exports.verify = async (req, res) => {
     const {token} = req.params;
 
-    if (!req.session.user) {
-        req.flash("error", "Session Expired");
+    const user = await PendingUser.findOne({verifyToken: token});
+
+    if (!user) {
+        req.flash("error", "Token Expired");
         return res.redirect("/listing");
     }
 
-    const {username, email, password, verifyToken} = req.session.user;
-    
-    if (verifyToken !== token) {
-        req.flash("error", "Invalid Token");
-        return res.redirect("/listing");
-    }
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
 
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`; 
-    const newUser = new User({username, email, profilePic});
+    const newUser = new User({
+        username: user.username,
+        email: user.email,
+        profilePic: profilePic,
+    });
 
     try {
-        let registeredUser = await User.register(newUser, password);
+        const registeredUser = await User.register(newUser, user.password);
+        await PendingUser.deleteMany({email: user.email});
         req.login(registeredUser, (err) => {
             if (err) return next(err);
             else {

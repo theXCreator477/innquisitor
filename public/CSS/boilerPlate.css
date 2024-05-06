@@ -1,16 +1,16 @@
 @font-face {
     font-family: "bold";
-    src: url("../assets/Fonts/Bold.otf");
+    src: url("../assets/Fonts/bold.woff2");
 }
 
 @font-face {
     font-family: "medium";
-    src: url("../assets/Fonts/Medium.otf");
+    src: url("../assets/Fonts/medium.woff2");
 }
 
 @font-face {
     font-family: "regular";
-    src: url("../assets/Fonts/Regular.otf");
+    src: url("../assets/Fonts/regular.woff2");
 }
 
 body {
