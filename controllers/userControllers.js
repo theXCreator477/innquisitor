@@ -106,30 +106,45 @@ module.exports.signup = async (req, res, next) => {
 };
 
 module.exports.verify = async (req, res) => {
+    console.log("PROGRAM STARTED");
     const {token} = req.params;
+    console.log("TOKEN FETCHED FROM PARAMS");
     const user = await PendingUser.findOne({verifyToken: token});
-
+    console.log("USER FOUND FROM DB");
     if (!user) {
+        console.log("IF STATEMENT EXECUTED");
         req.flash("error", "Token Expired");
+        console.log("FLASH MESSAGE SET TO ERROR AND REDIRECTED TO HOME");
         return res.redirect("/listing");
+        console.log("CODE RAN AFTER RETURN STATEMENT");
     }
 
     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    console.log("PROFILE PIC CHOSEN");
 
     const newUser = new User({
         username: user.username,
         email: user.email,
         profilePic: profilePic,
     });
+    console.log("NEW USER CREATED");
 
     try {
+        console.log("TRY BLOCK STARTED");
         await User.register(newUser, user.password);
+        console.log("USER REGISTERED");
         await PendingUser.deleteMany({email: user.email});
+        console.log("PENDING USER DELETED");
         req.flash("success", "Email verification successful");
+        console.log("FLASH MESSAGE SET TO SUCCESS");
     } catch (err) {
+        console.log("CATCH BLOCK STARTED");
+        console.log(err);
         req.flash("error", err.message);
+        console.log("FLASH MESSAGE SET TO ERROR FROM CATCH BLOCK");
     }
     res.redirect("/listing");
+    console.log("REDIRECTED TO HOME AT THE END OF THE PROGRAM");
 };
 
 module.exports.renderLoginForm = (req, res) => {
