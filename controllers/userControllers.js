@@ -105,21 +105,7 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-module.exports.verify = async (req, res, next) => {
-    const {token} = req.params;
-    const user = await PendingUser.findOne({verifyToken: token});
-
-    if (!user) {
-        req.flash("error", "Token Expired");
-        return res.redirect("/listing");
-    }
-
-    const url = `${req.protocol}://${req.headers.host}/user/register/${token}`;
-
-    res.render("users/register", {url});
-};
-
-module.exports.register = async (req, res, next) => {
+module.exports.verify = async (req, res) => {
     const {token} = req.params;
     const user = await PendingUser.findOne({verifyToken: token});
 
@@ -137,17 +123,13 @@ module.exports.register = async (req, res, next) => {
     });
 
     try {
-        const registeredUser = await User.register(newUser, user.password);
-        user.expiresAt = Date.now() + 10000; // 10 Seconds
-        await user.save();
-        req.login(registeredUser, () => {
-            req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
-            return res.redirect("/listing");
-        });
+        await User.register(newUser, user.password);
+        await PendingUser.deleteMany({email: user.email});
+        req.flash("success", "Email verification successful");
     } catch (err) {
         req.flash("error", err.message);
-        res.redirect("/listing");
     }
+    res.redirect("/listing");
 };
 
 module.exports.renderLoginForm = (req, res) => {
