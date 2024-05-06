@@ -140,8 +140,7 @@ module.exports.register = async (req, res, next) => {
         const registeredUser = await User.register(newUser, user.password);
         user.expiresAt = Date.now() + 10000; // 10 Seconds
         await user.save();
-        req.login(registeredUser, (err) => {
-            if (err) throw err;
+        req.login(registeredUser, () => {
             req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
             return res.redirect("/listing");
         });
