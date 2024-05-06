@@ -124,12 +124,13 @@ module.exports.verify = async (req, res, next) => {
 
     try {
         const registeredUser = await User.register(newUser, user.password);
-        await PendingUser.deleteMany({email: user.email});
-        req.login(registeredUser, (err) => {
-            if (err) return next(err);
+        req.login(registeredUser, async (err) => {
+            if (err) throw err;
+            await PendingUser.deleteMany({email: user.email});
             req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
-            return res.redirect("/listing");
+            res.redirect("/listing");
         });
+        
     } catch (err) {
         req.flash("error", err.message);
         res.redirect("/listing");
