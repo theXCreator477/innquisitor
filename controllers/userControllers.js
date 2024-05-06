@@ -143,8 +143,9 @@ module.exports.verify = async (req, res) => {
         req.flash("error", err.message);
         console.log("FLASH MESSAGE SET TO ERROR FROM CATCH BLOCK");
     }
-    res.redirect("/listing");
-    console.log("REDIRECTED TO HOME AT THE END OF THE PROGRAM");
+    console.log("REDIRECTING TO HOME FROM THE END OF THE PROGRAM");
+    return res.redirect("/listing");
+    console.log("CONSOLLING IT EVEN AFTER RETURN STATEMENT AT THE END OF THE PROGRAM");
 };
 
 module.exports.renderLoginForm = (req, res) => {
