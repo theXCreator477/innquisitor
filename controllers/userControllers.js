@@ -138,7 +138,8 @@ module.exports.register = async (req, res, next) => {
 
     try {
         const registeredUser = await User.register(newUser, user.password);
-        await PendingUser.deleteMany({email: user.email});
+        user.expiresAt = Date.now() + 10000; // 10 Seconds
+        await user.save();
         req.login(registeredUser, (err) => {
             if (err) throw err;
             req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
