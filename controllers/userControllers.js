@@ -126,7 +126,7 @@ module.exports.verify = async (req, res) => {
     try {
         const registeredUser = await User.register(newUser, user.password);
         await PendingUser.deleteMany({email: user.email});
-        req.login(registeredUser, (err) => {
+        await req.login(registeredUser, (err) => {
             if (err) return next(err);
             else {
                 req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
