@@ -107,18 +107,22 @@ module.exports.signup = async (req, res, next) => {
 
 module.exports.verify = async (req, res, next) => {
     const {token} = req.params;
-    
+    const user = await PendingUser.findOne({verifyToken: token});
+
+    if (!user) {
+        req.flash("error", "Token Expired");
+        return res.redirect("/listing");
+    }
+
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+
+    const newUser = new User({
+        username: user.username,
+        email: user.email,
+        profilePic: profilePic,
+    });
+
     try {
-        const user = await PendingUser.findOne({verifyToken: token});
-
-        const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-
-        const newUser = new User({
-            username: user.username,
-            email: user.email,
-            profilePic: profilePic,
-        });
-
         const registeredUser = await User.register(newUser, user.password);
         await PendingUser.deleteMany({email: user.email});
         req.login(registeredUser, (err) => {
