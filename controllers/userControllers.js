@@ -77,10 +77,12 @@ module.exports.signup = async (req, res, next) => {
                             </tr>
                             <tr>
                                 <td align="center">
-                                    <button type="button"
-                                        style="border: none; border-radius: 0.5rem; background-color: #FF385C; padding: 0.75rem 1.5rem; font-size: 1rem; margin: 0.5rem auto;">
-                                        <a href="${req.protocol}://${req.headers.host}/user/verify/${verifyToken}" style="text-decoration: none; color: white;">Verify Email</a>
-                                    </button>
+                                    <form method="post" action="${req.protocol}://${req.headers.host}/user/verify/${verifyToken}">
+                                        <button type="submit"
+                                            style="border: none; border-radius: 0.5rem; color: white; background-color: #FF385C; padding: 0.75rem 1.5rem; font-size: 1rem; margin: 0.5rem auto;">
+                                            Verify Email
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             <tr>
