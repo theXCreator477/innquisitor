@@ -11,6 +11,8 @@ router.route("/signup")
 
 router.get("/verify/:token", asyncWrap(UserControllers.verify));
 
+router.get("/register/:token", asyncWrap(UserControllers.register));
+
 router.route("/login")
     .get(UserControllers.renderLoginForm)
     .post(saveRedirectInfo, passport.authenticate("local", {failureRedirect: "/user/login", failureFlash: true}), UserControllers.login);

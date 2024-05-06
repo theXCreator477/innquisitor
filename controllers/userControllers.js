@@ -114,6 +114,20 @@ module.exports.verify = async (req, res, next) => {
         return res.redirect("/listing");
     }
 
+    const url = `${req.protocol}://${req.headers.host}/user/register/${token}`;
+
+    res.render("users/register", {url});
+};
+
+module.exports.register = async (req, res, next) => {
+    const {token} = req.params;
+    const user = await PendingUser.findOne({verifyToken: token});
+
+    if (!user) {
+        req.flash("error", "Token Expired");
+        return res.redirect("/listing");
+    }
+
     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
 
     const newUser = new User({
@@ -124,13 +138,12 @@ module.exports.verify = async (req, res, next) => {
 
     try {
         const registeredUser = await User.register(newUser, user.password);
-        req.login(registeredUser, async (err) => {
+        await PendingUser.deleteMany({email: user.email});
+        req.login(registeredUser, (err) => {
             if (err) throw err;
-            await PendingUser.deleteMany({email: user.email});
             req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
-            res.redirect("/listing");
+            return res.redirect("/listing");
         });
-        
     } catch (err) {
         req.flash("error", err.message);
         res.redirect("/listing");
