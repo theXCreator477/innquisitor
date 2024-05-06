@@ -105,33 +105,26 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-module.exports.verify = async (req, res) => {
+module.exports.verify = async (req, res, next) => {
     const {token} = req.params;
-
-    const user = await PendingUser.findOne({verifyToken: token});
-
-    if (!user) {
-        req.flash("error", "Token Expired");
-        return res.redirect("/listing");
-    }
-
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-
-    const newUser = new User({
-        username: user.username,
-        email: user.email,
-        profilePic: profilePic,
-    });
-
+    
     try {
+        const user = await PendingUser.findOne({verifyToken: token});
+
+        const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+
+        const newUser = new User({
+            username: user.username,
+            email: user.email,
+            profilePic: profilePic,
+        });
+
         const registeredUser = await User.register(newUser, user.password);
         await PendingUser.deleteMany({email: user.email});
-        await req.login(registeredUser, (err) => {
+        req.login(registeredUser, (err) => {
             if (err) return next(err);
-            else {
-                req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
-                res.redirect("/listing");
-            }
+            req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
+            res.redirect("/listing");
         });
     } catch (err) {
         req.flash("error", err.message);
