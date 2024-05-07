@@ -205,7 +205,7 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        registeredUser = await User.register(newUser, user.password);
+        // registeredUser = await User.register(newUser, user.password);
         await PendingUser.deleteMany({email: user.email});
     } catch (err) {
         req.flash("error", err.message);
