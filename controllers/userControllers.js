@@ -205,8 +205,8 @@ module.exports.verify = async (req, res) => {
 
     try {
         console.log("TRY CREATING USER");
-        createdUser = await newUser.setPassword(user.password);
-        await createdUser.save()
+        // createdUser = await newUser.setPassword(user.password);
+        await newUser.save()
         await PendingUser.deleteMany({email: user.email});
     } catch (err) {
         console.log("CAUGHT ERROR");
@@ -223,7 +223,7 @@ module.exports.verify = async (req, res) => {
             return res.redirect("/listing");
         }
         req.flash("success", "Email verification successful");
-        console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
+        console.log("REDIRECTING TO HOME FROM LOGIN FN");
         res.redirect("/listing");
     });
 
