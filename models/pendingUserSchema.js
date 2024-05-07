@@ -21,6 +21,10 @@ const pendingUserSchema = new Schema({
     expiresAt: {
         type: Date,
         required: true
+    },
+    verified: {
+        type: Boolean,
+        default: false
     }
 });
 
