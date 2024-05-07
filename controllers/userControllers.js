@@ -2,7 +2,6 @@ const User = require("../models/userSchema");
 const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const passport = require("passport");
 
 module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup");
@@ -114,8 +113,6 @@ module.exports.verify = async (req, res) => {
         user = await PendingUser.findOne({ verifyToken: token });
 
         if (user.verified) {
-            console.log(req.session);
-            console.log(req.user);
             await PendingUser.deleteMany({ email: user.email });
             req.flash("success", "Email verified successfully. You can now login to your account");
             return res.redirect("/listing");
@@ -134,9 +131,7 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        const registeredUser = await User.register(newUser, user.password);
-        req.session.user = registeredUser;
-        req.user = registeredUser;
+        await User.register(newUser, user.password);
         user.verified = true;
         await user.save();
         req.flash("success", "Email verified successfully. You can now login to your account");
