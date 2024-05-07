@@ -195,7 +195,7 @@ module.exports.verify = async (req, res) => {
         return res.redirect("/listing");
     }
 
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    // const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
 
     const newUser = new User({
         username: user.username,
@@ -214,18 +214,19 @@ module.exports.verify = async (req, res) => {
         return res.redirect("/listing");
     }
 
-    req.login(createdUser, (err) => {
-        console.log("LOGIN FUNCTION STARTED");
-        if (err) {
-            console.log("ERROR IN LOGIN FUNCTION");
-            req.flash("error", err.message);
-            console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
-            return res.redirect("/listing");
-        }
-        req.flash("success", "Email verification successful");
-        console.log("REDIRECTING TO HOME FROM LOGIN FN");
-        res.redirect("/listing");
-    });
+    // req.login(createdUser, (err) => {
+    //     console.log("LOGIN FUNCTION STARTED");
+    //     if (err) {
+    //         console.log("ERROR IN LOGIN FUNCTION");
+    //         req.flash("error", err.message);
+    //         console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
+    //         return res.redirect("/listing");
+    //     }
+    //     req.flash("success", "Email verification successful");
+    //     console.log("REDIRECTING TO HOME FROM LOGIN FN");
+    //     res.redirect("/listing");
+    // });
+    res.redirect("/listing");
 
     console.log("PROGRAM ENDED");
 };
