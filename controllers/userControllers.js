@@ -2,13 +2,14 @@ const User = require("../models/userSchema");
 const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const passport = require("passport");
 
 module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup");
 };
 
 module.exports.signup = async (req, res, next) => {
-    let {username, email, password} = req.body;
+    let { username, email, password } = req.body;
     const regexp = new RegExp('^[a-zA-Z0-9]+(\\s[a-zA-Z0-9]+)?$');
 
     if (!email || !username || !password) {
@@ -41,7 +42,7 @@ module.exports.signup = async (req, res, next) => {
     try {
         const verifyToken = crypto.randomBytes(16).toString("hex");
 
-        const user = new PendingUser({username, email, password, verifyToken, expiresAt: Date.now() + 30 * 60 * 1000});
+        const user = new PendingUser({ username, email, password, verifyToken, expiresAt: Date.now() + 30 * 60 * 1000 });
         await user.save();
 
         const transporter = nodemailer.createTransport({
@@ -51,7 +52,7 @@ module.exports.signup = async (req, res, next) => {
                 pass: process.env.GMAIL_APP_PASS
             }
         });
-    
+
         const mailOptions = {
             from: {
                 name: 'InnQuisitor',
@@ -93,48 +94,63 @@ module.exports.signup = async (req, res, next) => {
                         </table>
                     </body>`,
         }
-        
+
         await transporter.sendMail(mailOptions);
 
         req.flash("success", "A verification email has been sent to your email address. Please click the link to activate your account");
         res.redirect("/listing");
-        
+
     } catch (err) {
         req.flash("error", err.message);
         res.redirect("/listing");
     }
 };
 
-module.exports.verify = async (req, res) => {
-
-    console.log("PROGRAM STARTS");
-
-    const {token} = req.params;
-    const user = await PendingUser.findOne({verifyToken: token});
-
-    if (!user) {
-        console.log("IF BLOCK STARTS");
-        req.flash("error", "Verification link expired");
-        return res.redirect("/listing");
-    }
-
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-
-    const newUser = new User({
-        username: user.username,
-        email: user.email,
-        profilePic: profilePic,
+const loginUser = (req, user) => {
+    console.log("LOGIN USER STARTS");
+    return new Promise((resolve, reject) => {
+        req.login(user, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
     });
+};
+
+module.exports.verify = async (req, res) => {
+    console.log("PROGRAM STARTS");
+    const { token } = req.params;
 
     try {
-        console.log("TRY BLOCK STARTS");
-        await User.register(newUser, user.password);
-        await PendingUser.deleteMany({email: user.email});
-        req.flash("success", "Email verified successfully. You can now log in to your account");
+        const user = await PendingUser.findOne({ verifyToken: token });
+
+        if (user.verified) {
+            await PendingUser.deleteMany({ email: user.email });
+            req.flash("success", "Email verified successfully.");
+            return res.redirect("/listing");
+        }
+
+        const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+        const newUser = new User({
+            username: user.username,
+            email: user.email,
+            profilePic: profilePic,
+        });
+
+        const registeredUser = await User.register(newUser, user.password);
+
+        user.verified = true;
+        await user.save();
+
+        await loginUser(req, registeredUser);
+
+        req.flash("success", "Email verified successfully.");
         res.redirect("/listing");
-        console.log("TRY BLOCK ENDS");
+
     } catch (err) {
-        req.flash("error", err.message);
+        req.flash("error", "Verification link expired");
         res.redirect("/listing");
     }
     console.log("PROGRAM ENDS");
@@ -145,7 +161,7 @@ module.exports.renderLoginForm = (req, res) => {
 };
 
 module.exports.login = (req, res) => {
-    let {url, method} = res.locals.redirectInfo || {};
+    let { url, method } = res.locals.redirectInfo || {};
     let redirectUrl = url || "/listing";
     req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
     if (method && method !== 'GET') res.redirect(307, redirectUrl);
@@ -170,7 +186,7 @@ module.exports.renderForgot = (req, res) => {
 
 //To submit the username
 module.exports.submitForgot = async (req, res) => {
-    let {userInfo} = req.body;
+    let { userInfo } = req.body;
     if (!userInfo) {
         req.flash("error", "The field is requierd");
         res.redirect("/user/forgot");
@@ -179,8 +195,8 @@ module.exports.submitForgot = async (req, res) => {
 
     userInfo = userInfo.trim();
     let user;
-    if (userInfo.includes('@')) user = await User.findOne({email: userInfo});
-    else  user = await User.findOne({username: userInfo});
+    if (userInfo.includes('@')) user = await User.findOne({ email: userInfo });
+    else user = await User.findOne({ username: userInfo });
 
     if (!user) {
         req.flash("error", "credentials do not match our records.");
@@ -189,7 +205,7 @@ module.exports.submitForgot = async (req, res) => {
     }
 
     const resetToken = user.generateResetToken();
-    
+
     await user.save();
 
     const transporter = nodemailer.createTransport({
@@ -259,16 +275,16 @@ module.exports.submitForgot = async (req, res) => {
 
 //To get the new password page
 module.exports.renderReset = async (req, res) => {
-    const {resetToken} = req.params;
+    const { resetToken } = req.params;
     try {
         const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
-    
+
         if (!user) {
-          req.flash("error", "Token Expired");
-          res.redirect("/user/forgot");
-          return;
+            req.flash("error", "Token Expired");
+            res.redirect("/user/forgot");
+            return;
         }
-    
+
         res.render("users/reset", { resetToken });
     } catch (err) {
         req.flash("error", err.message);
@@ -278,19 +294,19 @@ module.exports.renderReset = async (req, res) => {
 
 //To submit the new password
 module.exports.submitReset = async (req, res) => {
-    const {create, confirm} = req.body.password;
-    const {resetToken} = req.params;
+    const { create, confirm } = req.body.password;
+    const { resetToken } = req.params;
 
     if (!create || !confirm) {
         req.flash("error", "The fields are required");
         res.redirect("/user/login");
         return;
     }
-    
+
     if (create === confirm) {
         try {
-            const user = await User.findOne({resetToken, resetTokenExpiration: {$gt: Date.now()}});
-            
+            const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
+
             if (!user) {
                 req.flash("error", "Token Expired");
                 res.redirect("/user/forgot");
@@ -319,7 +335,7 @@ module.exports.submitReset = async (req, res) => {
             req.flash("error", err.message);
             res.redirect("/user/forgot");
         }
-        
+
     } else {
         req.flash("error", "Passwords do not match");
         res.redirect(`/user/reset/${resetToken}`);
@@ -327,6 +343,6 @@ module.exports.submitReset = async (req, res) => {
 };
 
 module.exports.renderBookings = async (req, res) => {
-    const user = await req.user.populate({path: "reservations", populate: {path: "listing"}});
-    res.render("listings/bookings", {user});
+    const user = await req.user.populate({ path: "reservations", populate: { path: "listing" } });
+    res.render("listings/bookings", { user });
 }
