@@ -195,7 +195,8 @@ module.exports.verify = async (req, res) => {
         return res.redirect("/listing");
     }
 
-    // const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    // const profilePic = `/assets/Images/pic-1.avif`;
 
     const newUser = new User({
         username: user.username,
