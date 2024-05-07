@@ -114,7 +114,7 @@ module.exports.verify = async (req, res) => {
 
         if (user.verified) {
             await PendingUser.deleteMany({ email: user.email });
-            req.flash("success", "Email verified successfully. You can now login to your account");
+            req.flash("success", "Email verified successfully");
             return res.redirect("/listing");
         }
 
@@ -131,15 +131,23 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        await User.register(newUser, user.password);
+        const registeredUser = await User.register(newUser, user.password);
+
         user.verified = true;
         await user.save();
-        req.flash("success", "Email verified successfully. You can now login to your account");
+
+        req.login(registeredUser, err => {
+            if (err) {
+                req.flash("error", err.message);
+                return res.redirect("/listing");
+            }
+            return res.redirect("/listing");
+        });
+
     } catch (err) {
         req.flash("error", err.message);
+        return res.redirect("/listing");
     }
-
-    res.redirect("/listing");
 };
 
 module.exports.renderLoginForm = (req, res) => {
