@@ -1,6 +1,7 @@
 const Listing = require("./models/listingSchema");
 const {reviewSchema, listingSchema} = require("./schemaValidation");
 const User = require("./models/userSchema");
+const PendingUser = require("./models/pendingUserSchema");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -58,4 +59,47 @@ module.exports.validateToken = async (req, res, next) => {
         return res.redirect("/listing");
     }
     next();
+};
+
+module.exports.registerUser = async (req, res, next) => {
+    const {token} = req.params;
+    let user, registeredUser;
+
+    try {
+        user = await PendingUser.findOne({verifyToken: token});
+    } catch (err) {
+        req.flash("error", "Something went wrong. Please try again");
+        return res.redirect("/listing");
+    }
+
+    if (!user) {
+        req.flash("error", "Token Expired");
+        return res.redirect("/listing");
+    }
+
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+
+    const newUser = new User({
+        username: user.username,
+        email: user.email,
+        profilePic: profilePic,
+    });
+
+    try {
+        registeredUser = await User.register(newUser, user.password);
+        await PendingUser.deleteMany({email: user.email});
+    } catch (err) {
+        req.flash("error", err.message);
+        return res.redirect("/listing");
+    }
+
+    if (registeredUser) {        
+        req.login(registeredUser, (err) => {
+            if (err) return next(err);
+            next();
+        });
+    } else {
+        req.flash("error", "Something went wrong. Please try again.");
+        return res.redirect("/listing");
+    }
 };

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const {isLoggedIn, saveRedirectInfo} = require("../middleware");
+const {isLoggedIn, saveRedirectInfo, registerUser} = require("../middleware");
 const UserControllers = require("../controllers/userControllers");
 const asyncWrap = require("../utils/asyncWrap");
 
@@ -9,7 +9,7 @@ router.route("/signup")
     .get(UserControllers.renderSignupForm)
     .post(asyncWrap(UserControllers.signup));
 
-router.get("/verify/:token", asyncWrap(UserControllers.verify));
+router.get("/verify/:token", registerUser, asyncWrap(UserControllers.verify));
 
 router.route("/login")
     .get(UserControllers.renderLoginForm)

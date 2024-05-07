@@ -177,54 +177,14 @@ module.exports.signup = async (req, res, next) => {
 //     console.log(res.locals);
 // };
 
-module.exports.verify = async (req, res) => {
-    const {token} = req.params;
-    let user, registeredUser;
-
-    try {
-        user = await PendingUser.findOne({verifyToken: token});
-    } catch (err) {
-        req.flash("error", "Something went wrong. Please try again");
-        return res.redirect("/listing");
-    }
-
-    if (!user) {
-        if (!res.locals.success.length) req.flash("error", "Token Expired");
-        return res.redirect("/listing");
-    }
-
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-
-    const newUser = new User({
-        username: user.username,
-        email: user.email,
-        profilePic: profilePic,
-    });
-
-    try {
-        registeredUser = await User.register(newUser, user.password);
-        await PendingUser.deleteMany({email: user.email});
-    } catch (err) {
-        req.flash("error", err.message);
-        return res.redirect("/listing");
-    }
-
-    if (registeredUser) {
-        req.login(registeredUser, (err) => {
-            if (err) return next(err);
-            req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
-            return res.redirect("/listing");
-        });
-    } else {
-        req.flash("error", "Something went wrong. Please try again.");
-        return res.redirect("/listing");
-    }
+module.exports.verify = async (req, res, next) => {
+    req.flash("success", "Email verification successful");
+    res.redirect("/listing");
 };
 
-function autoLogin(user) {
-    console.log("AUTO LOGIN CALLED");
-    console.log(user);
-}
+// module.exports.register = (req, res) => {
+
+// };
 
 module.exports.renderLoginForm = (req, res) => {
     res.render("users/login");
