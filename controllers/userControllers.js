@@ -189,7 +189,7 @@ module.exports.verify = async (req, res) => {
     }
 
     if (!user) {
-        req.flash("error", "Token Expired");
+        if (!res.locals.success.length) req.flash("error", "Token Expired");
         return res.redirect("/listing");
     }
 
