@@ -178,10 +178,52 @@ module.exports.signup = async (req, res, next) => {
 // };
 
 module.exports.verify = async (req, res) => {
-    console.log("CAME TO VERIFY ROUTE");
-    req.flash("success", "Email verification successful");
-    res.redirect("/listing");
-    console.log("REDIRECTING TO HOME FROM VERIFY ROUTE");
+    console.log("PROGRAM STARTED");
+    const {token} = req.params;
+    let user, registeredUser;
+
+    try {
+        user = await PendingUser.findOne({verifyToken: token});
+    } catch (err) {
+        req.flash("error", "Something went wrong. Please try again");
+        return res.redirect("/listing");
+    }
+
+    if (!user) {
+        console.log("IF BLOCK EXECUTING");
+        req.flash("error", "Token Expired");
+        console.log("REDIRECTING TO HOME FROM IF BLOCK");
+        return res.redirect("/listing");
+    }
+
+    // const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    const profilePic = `/assets/Images/pic-1.avif`;
+
+    const newUser = new User({
+        username: user.username,
+        email: user.email,
+        profilePic: profilePic,
+    });
+
+    try {
+        registeredUser = await User.register(newUser, user.password);
+        await PendingUser.deleteMany({email: user.email});
+    } catch (err) {
+        req.flash("error", err.message);
+        return res.redirect("/listing");
+    }
+
+    req.login(registeredUser, (err) => {
+        if (err) {
+            console.log("ERROR IN LOGIN FUNCTION");
+          req.flash("error", "Login failed");
+          return res.redirect("/listing");
+        }
+        console.log("REDIRECTING USER FROM LOGIN FUNCTION");
+        req.flash("success", "Email verification successful");
+        return res.redirect("/listing");
+    });
+    console.log("PROGRAM ENDED");
 };
 
 // module.exports.register = (req, res) => {
