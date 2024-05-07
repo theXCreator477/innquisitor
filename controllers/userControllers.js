@@ -107,7 +107,6 @@ module.exports.signup = async (req, res, next) => {
 };
 
 module.exports.verify = async (req, res) => {
-    console.log("PROGRAM STARTS");
     const { token } = req.params;
     let user;
     
@@ -115,7 +114,8 @@ module.exports.verify = async (req, res) => {
         user = await PendingUser.findOne({ verifyToken: token });
 
         if (user.verified) {
-            console.log("VERIFIED BLOCK STARTS");
+            console.log(req.session);
+            console.log(req.user);
             await PendingUser.deleteMany({ email: user.email });
             req.flash("success", "Email verified successfully. You can now login to your account");
             return res.redirect("/listing");
@@ -134,7 +134,9 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        await User.register(newUser, user.password);
+        const registeredUser = await User.register(newUser, user.password);
+        req.session.user = registeredUser;
+        req.user = registeredUser;
         user.verified = true;
         await user.save();
         req.flash("success", "Email verified successfully. You can now login to your account");
@@ -143,7 +145,6 @@ module.exports.verify = async (req, res) => {
     }
 
     res.redirect("/listing");
-    console.log("PROGRAM ENDS");
 };
 
 module.exports.renderLoginForm = (req, res) => {
