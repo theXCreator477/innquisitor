@@ -1,7 +1,6 @@
 const Listing = require("./models/listingSchema");
 const {reviewSchema, listingSchema} = require("./schemaValidation");
 const User = require("./models/userSchema");
-const PendingUser = require("./models/pendingUserSchema");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {

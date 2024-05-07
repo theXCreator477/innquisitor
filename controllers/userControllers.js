@@ -1,5 +1,4 @@
 const User = require("../models/userSchema");
-const Listing = require("../models/listingSchema");
 const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -180,7 +179,7 @@ module.exports.signup = async (req, res, next) => {
 module.exports.verify = async (req, res) => {
     console.log("PROGRAM STARTED");
     const {token} = req.params;
-    let user, registeredUser;
+    let user, createdUser;
 
     try {
         user = await PendingUser.findOne({verifyToken: token});
@@ -205,26 +204,29 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        // registeredUser = await User.register(newUser, user.password);
+        console.log("TRY CREATING USER");
+        createdUser = await newUser.setPassword(user.password);
+        await createdUser.save()
         await PendingUser.deleteMany({email: user.email});
     } catch (err) {
+        console.log("CAUGHT ERROR");
         req.flash("error", err.message);
         return res.redirect("/listing");
     }
 
-    // req.login(registeredUser, (err) => {
-    //     if (err) {
-    //         console.log("ERROR IN LOGIN FUNCTION");
-    //       req.flash("error", "Login failed");
-    //       return res.redirect("/listing");
-    //     }
-    //     console.log("REDIRECTING USER FROM LOGIN FUNCTION");
-    //     req.flash("success", "Email verification successful");
-    //     return res.redirect("/listing");
-    // });
-    req.flash("success", "Email verification successful");
-    console.log("REDIRECTING TO HOME FROM END");
-    res.redirect("/listing");
+    req.login(createdUser, (err) => {
+        console.log("LOGIN FUNCTION STARTED");
+        if (err) {
+            console.log("ERROR IN LOGIN FUNCTION");
+            req.flash("error", err.message);
+            console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
+            return res.redirect("/listing");
+        }
+        req.flash("success", "Email verification successful");
+        console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
+        res.redirect("/listing");
+    });
+
     console.log("PROGRAM ENDED");
 };
 
