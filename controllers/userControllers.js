@@ -137,10 +137,9 @@ module.exports.verify = async (req, res) => {
         console.log("TRY CREATING USER");
         registeredUser = await User.register(newUser, user.password);
         console.log("TRY SAVING USER");
-        await registeredUser.save();
         user.verified = true;
         await user.save();
-        console.log("TRY VERIDIED TRUE");
+        console.log("TRY VERIFIED TRUE");
     } catch (err) {
         console.log("CAUGHT ERROR IN TRY CREATING USER");
         req.flash("error", err.message);
@@ -163,8 +162,63 @@ module.exports.verify = async (req, res) => {
     console.log("PROGRAM ENDED");
 };
 
-// module.exports.register = (req, res) => {
+// module.exports.verify = async (req, res) => {
+//     console.log("PROGRAM STARTED");
+//     const {token} = req.params;
+//     let user, registeredUser;
 
+//     try {
+//         console.log("TRY FINDING PENDING USER");
+//         user = await PendingUser.findOne({verifyToken: token});
+//     } catch (err) {
+//         req.flash("error", "Token Expired");
+//         return res.redirect("/listing");
+//     }
+
+//     if (!user) {
+//         console.log("USER VERIFIED BLOCK");
+        
+//         req.flash("success", "Email verification successful");
+//         console.log("REDIRECTING USER FROM VERIFIED BLOCK");
+//         return res.redirect("/listing");
+//     }
+
+//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+
+//     const newUser = new User({
+//         username: user.username,
+//         email: user.email,
+//         profilePic: profilePic,
+//     });
+
+//     try {
+//         console.log("TRY CREATING USER");
+//         registeredUser = await User.register(newUser, user.password);
+//         console.log("TRY SAVING USER");
+//         await registeredUser.save();
+//         user.verified = true;
+//         await user.save();
+//         console.log("TRY VERIDIED TRUE");
+//     } catch (err) {
+//         console.log("CAUGHT ERROR IN TRY CREATING USER");
+//         req.flash("error", err.message);
+//         return res.redirect("/listing");
+//     }
+
+//     req.login(registeredUser, (err) => {
+//         console.log("LOGIN FUNCTION STARTED");
+//         if (err) {
+//             console.log("ERROR IN LOGIN FUNCTION");
+//             req.flash("error", err.message);
+//             console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
+//             return res.redirect("/listing");
+//         }
+//         req.flash("success", "Email verification successful");
+//         console.log("REDIRECTING TO HOME FROM LOGIN FN");
+//         res.redirect("/listing");
+//     });
+
+//     console.log("PROGRAM ENDED");
 // };
 
 module.exports.renderLoginForm = (req, res) => {
