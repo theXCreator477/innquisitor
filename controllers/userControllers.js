@@ -225,9 +225,8 @@ module.exports.verify = async (req, res) => {
         }
         req.flash("success", "Email verification successful");
         console.log("REDIRECTING TO HOME FROM LOGIN FN");
-        res.redirect("/listing");
+        return res.redirect("/listing");
     });
-    res.redirect("/listing");
 
     console.log("PROGRAM ENDED");
 };
