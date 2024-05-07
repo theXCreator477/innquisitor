@@ -62,6 +62,7 @@ module.exports.validateToken = async (req, res, next) => {
 };
 
 module.exports.registerUser = async (req, res, next) => {
+    console.log("PROGRAM STARTED");
     const {token} = req.params;
     let user, registeredUser;
 
@@ -73,7 +74,9 @@ module.exports.registerUser = async (req, res, next) => {
     }
 
     if (!user) {
+        console.log("IF BLOCK EXECUTING");
         req.flash("error", "Token Expired");
+        console.log("REDIRECTING TO HOME FROM IF BLOCK");
         return res.redirect("/listing");
     }
 
@@ -93,13 +96,14 @@ module.exports.registerUser = async (req, res, next) => {
         return res.redirect("/listing");
     }
 
-    if (registeredUser) {        
-        req.login(registeredUser, (err) => {
-            if (err) return next(err);
-            next();
-        });
-    } else {
-        req.flash("error", "Something went wrong. Please try again.");
-        return res.redirect("/listing");
-    }
+    req.login(registeredUser, (err) => {
+        if (err) {
+            console.log("ERROR IN LOGIN FUNCTION");
+          req.flash("error", "Login failed");
+          return res.redirect("/listing");
+        }
+        console.log("NEXT CALLED");
+        next();
+    });
+    console.log("PROGRAM ENDED");
 };

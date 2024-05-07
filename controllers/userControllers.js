@@ -177,9 +177,11 @@ module.exports.signup = async (req, res, next) => {
 //     console.log(res.locals);
 // };
 
-module.exports.verify = async (req, res, next) => {
+module.exports.verify = async (req, res) => {
+    console.log("CAME TO VERIFY ROUTE");
     req.flash("success", "Email verification successful");
     res.redirect("/listing");
+    console.log("REDIRECTING TO HOME FROM VERIFY ROUTE");
 };
 
 // module.exports.register = (req, res) => {
