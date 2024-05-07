@@ -115,12 +115,13 @@ module.exports.verify = async (req, res) => {
         user = await PendingUser.findOne({verifyToken: token});
         if (user.verified) {
             console.log("USER VERIFIED BLOCK");
-            await PendingUser.deleteMany({email: user.email});
+            // await PendingUser.deleteMany({email: user.email});
             req.flash("success", "Email verification successful");
             console.log("REDIRECTING USER FROM VERIFIED BLOCK");
             return res.redirect("/listing");
         }
     } catch (err) {
+        console.log("TOKEN EXPIRED ERROR");
         req.flash("error", "Token Expired");
         return res.redirect("/listing");
     }
