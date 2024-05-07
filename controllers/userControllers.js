@@ -106,53 +106,43 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-const loginUser = (req, user) => {
-    console.log("LOGIN USER STARTS");
-    return new Promise((resolve, reject) => {
-        req.login(user, (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
-};
-
 module.exports.verify = async (req, res) => {
     console.log("PROGRAM STARTS");
     const { token } = req.params;
-
+    let user;
+    
     try {
-        const user = await PendingUser.findOne({ verifyToken: token });
+        user = await PendingUser.findOne({ verifyToken: token });
 
         if (user.verified) {
+            console.log("VERIFIED BLOCK STARTS");
             await PendingUser.deleteMany({ email: user.email });
-            req.flash("success", "Email verified successfully.");
+            req.flash("success", "Email verified successfully. You can now login to your account");
             return res.redirect("/listing");
         }
 
-        const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-        const newUser = new User({
-            username: user.username,
-            email: user.email,
-            profilePic: profilePic,
-        });
-
-        const registeredUser = await User.register(newUser, user.password);
-
-        user.verified = true;
-        await user.save();
-
-        await loginUser(req, registeredUser);
-
-        req.flash("success", "Email verified successfully.");
-        res.redirect("/listing");
-
     } catch (err) {
         req.flash("error", "Verification link expired");
-        res.redirect("/listing");
+        return res.redirect("/listing");
     }
+
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    const newUser = new User({
+        username: user.username,
+        email: user.email,
+        profilePic: profilePic,
+    });
+
+    try {
+        await User.register(newUser, user.password);
+        user.verified = true;
+        await user.save();
+        req.flash("success", "Email verified successfully. You can now login to your account");
+    } catch (err) {
+        req.flash("error", err.message);
+    }
+
+    res.redirect("/listing");
     console.log("PROGRAM ENDS");
 };
 
