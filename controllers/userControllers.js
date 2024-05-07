@@ -196,8 +196,7 @@ module.exports.verify = async (req, res) => {
         return res.redirect("/listing");
     }
 
-    // const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-    const profilePic = `/assets/Images/pic-1.avif`;
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
 
     const newUser = new User({
         username: user.username,
@@ -206,23 +205,26 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        // registeredUser = await User.register(newUser, user.password);
+        registeredUser = await User.register(newUser, user.password);
         await PendingUser.deleteMany({email: user.email});
     } catch (err) {
         req.flash("error", err.message);
         return res.redirect("/listing");
     }
 
-    req.login(registeredUser, (err) => {
-        if (err) {
-            console.log("ERROR IN LOGIN FUNCTION");
-          req.flash("error", "Login failed");
-          return res.redirect("/listing");
-        }
-        console.log("REDIRECTING USER FROM LOGIN FUNCTION");
-        req.flash("success", "Email verification successful");
-        return res.redirect("/listing");
-    });
+    // req.login(registeredUser, (err) => {
+    //     if (err) {
+    //         console.log("ERROR IN LOGIN FUNCTION");
+    //       req.flash("error", "Login failed");
+    //       return res.redirect("/listing");
+    //     }
+    //     console.log("REDIRECTING USER FROM LOGIN FUNCTION");
+    //     req.flash("success", "Email verification successful");
+    //     return res.redirect("/listing");
+    // });
+    req.flash("success", "Email verification successful");
+    console.log("REDIRECTING TO HOME FROM END");
+    res.redirect("/listing");
     console.log("PROGRAM ENDED");
 };
 
