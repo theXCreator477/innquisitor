@@ -97,7 +97,7 @@ module.exports.signup = async (req, res, next) => {
         await transporter.sendMail(mailOptions);
 
         req.flash("success", "A verification email has been sent to your email address. Please click the link to activate your account");
-        req.redirect("/listing");
+        res.redirect("/listing");
         
     } catch (err) {
         req.flash("error", err.message);
@@ -106,22 +106,49 @@ module.exports.signup = async (req, res, next) => {
 };
 
 module.exports.verify = async (req, res) => {
-    console.log("PROGRAM STARTED");
+
+    console.log("LOCALS AT START");
+    console.log(res.locals);
+    console.log();
+    console.log("SESSION AT START");
+    console.log(req.session);
+    console.log();
+
     const {token} = req.params;
     let user, registeredUser;
 
     try {
-        console.log("TRY FINDING PENDING USER");
         user = await PendingUser.findOne({verifyToken: token});
         if (user.verified) {
-            console.log("USER VERIFIED BLOCK");
-            // await PendingUser.deleteMany({email: user.email});
+
+            console.log("LOCALS AT START OF VERIFIED BLOCK");
+            console.log(res.locals);
+            console.log();
+            console.log("SESSION AT START OF VERIFIED BLOCK");
+            console.log(req.session);
+            console.log();
+
+            await PendingUser.deleteMany({email: user.email}); 
+
+            console.log("LOCALS AFTER DELETING PENDING USER");
+            console.log(res.locals);
+            console.log();
+            console.log("SESSION AFTER DELETING PENDING USER");
+            console.log(req.session);
+            console.log();
+
             req.flash("success", "Email verification successful");
-            console.log("REDIRECTING USER FROM VERIFIED BLOCK");
+
+            console.log("LOCALS AFTER SETTING FLASH TO SUCCESS IN VERIFIED BLOCK");
+            console.log(res.locals);
+            console.log();
+            console.log("SESSION AFTER SETTING FLASH TO SUCCESS IN VERIFIED BLOCK");
+            console.log(req.session);
+            console.log();
+
             return res.redirect("/listing");
         }
     } catch (err) {
-        console.log("TOKEN EXPIRED ERROR");
         req.flash("error", "Token Expired");
         return res.redirect("/listing");
     }
@@ -135,92 +162,77 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        console.log("TRY CREATING USER");
+        console.log("LOCALS AT TRY BLOCK OF REGISTER");
+        console.log(res.locals);
+        console.log();
+        console.log("SESSION AT TRY BLOCK OF REGISTER");
+        console.log(req.session);
+        console.log();
+
         registeredUser = await User.register(newUser, user.password);
-        console.log("TRY SAVING USER");
+
+        console.log("LOCALS AFTER USER REGISTER");
+        console.log(res.locals);
+        console.log();
+        console.log("SESSION AFTER USER REGISTER");
+        console.log(req.session);
+        console.log();
+
         user.verified = true;
         await user.save();
-        console.log("TRY VERIFIED TRUE");
     } catch (err) {
-        console.log("CAUGHT ERROR IN TRY CREATING USER");
         req.flash("error", err.message);
         return res.redirect("/listing");
     }
 
-    req.login(registeredUser, (err) => {
-        console.log("LOGIN FUNCTION STARTED");
-        if (err) {
-            console.log("ERROR IN LOGIN FUNCTION");
-            req.flash("error", err.message);
-            console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
+    req.login(registeredUser, (error) => {
+
+        console.log("LOCALS AT START OF LOGIN FN");
+        console.log(res.locals);
+        console.log();
+        console.log("SESSION AT START OF LOGIN FN");
+        console.log(req.session);
+        console.log();
+
+        if (error) {
+            req.flash("error", error.message);
             return res.redirect("/listing");
         }
+
+        console.log("LOCALS BEFORE SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
+        console.log(res.locals);
+        console.log();
+        console.log("SESSION BEFORE SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
+        console.log(req.session);
+        console.log();
+
         req.flash("success", "Email verification successful");
-        console.log("REDIRECTING TO HOME FROM LOGIN FN");
+
+        console.log("LOCALS AFTER SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
+        console.log(res.locals);
+        console.log();
+        console.log("SESSION AFTER SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
+        console.log(req.session);
+        console.log();
+
         res.redirect("/listing");
+
+        console.log("LOCALS AT THE END OF LOGIN FN");
+        console.log(res.locals);
+        console.log();
+        console.log("SESSION AT THE END OF LOGIN FN");
+        console.log(req.session);
+        console.log();
     });
 
-    console.log("PROGRAM ENDED");
+    console.log("LOCALS AT THE END OF PROGRAM");
+    console.log(res.locals);
+    console.log();
+    console.log("SESSION AT THE END OF PROGRAM");
+    console.log(req.session);
+    console.log();
+
 };
-
-// module.exports.verify = async (req, res) => {
-//     console.log("PROGRAM STARTED");
-//     const {token} = req.params;
-//     let user, registeredUser;
-
-//     try {
-//         console.log("TRY FINDING PENDING USER");
-//         user = await PendingUser.findOne({verifyToken: token});
-//     } catch (err) {
-//         req.flash("error", "Token Expired");
-//         return res.redirect("/listing");
-//     }
-
-//     if (!user) {
-//         console.log("USER VERIFIED BLOCK");
-        
-//         req.flash("success", "Email verification successful");
-//         console.log("REDIRECTING USER FROM VERIFIED BLOCK");
-//         return res.redirect("/listing");
-//     }
-
-//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-
-//     const newUser = new User({
-//         username: user.username,
-//         email: user.email,
-//         profilePic: profilePic,
-//     });
-
-//     try {
-//         console.log("TRY CREATING USER");
-//         registeredUser = await User.register(newUser, user.password);
-//         console.log("TRY SAVING USER");
-//         await registeredUser.save();
-//         user.verified = true;
-//         await user.save();
-//         console.log("TRY VERIDIED TRUE");
-//     } catch (err) {
-//         console.log("CAUGHT ERROR IN TRY CREATING USER");
-//         req.flash("error", err.message);
-//         return res.redirect("/listing");
-//     }
-
-//     req.login(registeredUser, (err) => {
-//         console.log("LOGIN FUNCTION STARTED");
-//         if (err) {
-//             console.log("ERROR IN LOGIN FUNCTION");
-//             req.flash("error", err.message);
-//             console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FN");
-//             return res.redirect("/listing");
-//         }
-//         req.flash("success", "Email verification successful");
-//         console.log("REDIRECTING TO HOME FROM LOGIN FN");
-//         res.redirect("/listing");
-//     });
-
-//     console.log("PROGRAM ENDED");
-// };
 
 module.exports.renderLoginForm = (req, res) => {
     res.render("users/login");
@@ -239,6 +251,7 @@ module.exports.logout = (req, res, next) => {
         if (err) return next(err);
         else {
             req.flash("success", "Logged Out Successfully");
+            console.log(req.session);
             res.redirect("/listing");
         }
     });
