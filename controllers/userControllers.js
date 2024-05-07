@@ -106,85 +106,125 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
+// module.exports.verify = async (req, res) => {
+//     console.log("PROGRAM STARTED\n");
+
+//     const {token} = req.params;
+//     console.log("TOKEN FETCHED FROM PARAMS\n");
+
+//     const user = await PendingUser.findOne({verifyToken: token});
+//     console.log("USER FOUND FROM DB\n");
+
+//     if (!user) {
+//         console.log("IF STATEMENT EXECUTED\n");
+
+//         req.flash("error", "Token Expired");
+//         console.log("FLASH MESSAGE SET TO ERUR\n");
+
+//         console.log("REDIRECTING TO HOME FROM IF BLOCK\n");
+//         return res.redirect(307, "/listing");
+//     }
+
+//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+//     console.log("PROFILE PIC CHOSEN\n");
+
+//     const newUser = new User({
+//         username: user.username,
+//         email: user.email,
+//         profilePic: profilePic,
+//     });
+//     console.log("NEW USER CREATED\n");
+
+//     try {
+//         console.log("TRY BLOCK STARTED\n");
+
+//         const registeredUser = await User.register(newUser, user.password);
+//         console.log("USER REGISTERED\n");
+
+//         await PendingUser.deleteMany({email: user.email});
+//         console.log("PENDING USER DELETED\n");
+
+//         await req.login(registeredUser, (err) => {
+//             console.log("LOGIN FUNCTION STARTED\n");
+//             if (err) {
+//                 console.log("ERROR IN LOGIN FUNCTION\n");
+//                 console.log(err);
+//                 req.flash("error", "Error logging in");
+//                 console.log("FLASH MESSAGE SET TO ERROR IN LOGIN FUNCTION\n");
+//                 console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FUNCTION\n");
+//                 return res.redirect(307, "/listing");
+//             }
+            
+//             req.flash("success", "Email verification successful");
+//             console.log("FLASH MESSAGE SET TO SUCCESS IN LOGIN FUNCTION\n");
+
+//             console.log("REDIRECTING TO HOME FROM LOGIN FUNCTION\n");
+//             return res.redirect(307, "/listing");
+//         });
+
+//     } catch (err) {
+//         console.log("CATCH BLOCK STARTED\n");
+//         console.log(err);
+
+//         req.flash("error", err.message);
+//         console.log("FLASH MESSAGE SET TO ERROR FROM CATCH BLOCK\n");
+
+//         console.log("REDIRECTING TO HOME FROM CATCH BLOCK\n");
+//         return res.redirect(307, "/listing");
+//     }
+//     console.log("PROGRAM ENDED\n");
+//     console.log("LOCALS AT THE END\n");
+//     console.log(res.locals);
+// };
+
 module.exports.verify = async (req, res) => {
-
-    console.log("PROGRAM STARTED\n");
-    console.log("LOCALS AT START\n");
-    console.log(res.locals);
-
     const {token} = req.params;
-    console.log("TOKEN FETCHED FROM PARAMS\n");
+    let user, registeredUser;
 
-    const user = await PendingUser.findOne({verifyToken: token});
-    console.log("USER FOUND FROM DB\n");
+    try {
+        user = await PendingUser.findOne({verifyToken: token});
+    } catch (err) {
+        req.flash("error", "Something went wrong. Please try again");
+        return res.redirect("/listing");
+    }
 
     if (!user) {
-        console.log("IF STATEMENT EXECUTED\n");
-        console.log("LOCALS IN IF BLOCK\n");
-        console.log(res.locals);
-
         req.flash("error", "Token Expired");
-        console.log("FLASH MESSAGE SET TO ERUR\n");
-
-        console.log("REDIRECTING TO HOME FROM IF BLOCK\n");
-        return res.redirect(307, "/listing");
+        return res.redirect("/listing");
     }
 
     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-    console.log("PROFILE PIC CHOSEN\n");
 
     const newUser = new User({
         username: user.username,
         email: user.email,
         profilePic: profilePic,
     });
-    console.log("NEW USER CREATED\n");
 
     try {
-        console.log("TRY BLOCK STARTED\n");
-        console.log("LOCALS IN TRY BLOCK\n");
-        console.log(res.locals);
-
-        const registeredUser = await User.register(newUser, user.password);
-        console.log("USER REGISTERED\n");
-
+        registeredUser = await User.register(newUser, user.password);
         await PendingUser.deleteMany({email: user.email});
-        console.log("PENDING USER DELETED\n");
-
-        await req.login(registeredUser, (err) => {
-            console.log("LOGIN FUNCTION STARTED\n");
-            console.log("LOCALS IN LOGIN FUNCTION\n");
-            console.log(res.locals);
-            if (err) {
-                console.log("ERROR IN LOGIN FUNCTION\n");
-                console.log(err);
-                req.flash("error", "Error logging in");
-                console.log("FLASH MESSAGE SET TO ERROR IN LOGIN FUNCTION\n");
-                console.log("REDIRECTING TO HOME FROM ERROR IN LOGIN FUNCTION\n");
-                return res.redirect(307, "/listing");
-            }
-            
-            req.flash("success", "Email verification successful");
-            console.log("FLASH MESSAGE SET TO SUCCESS IN LOGIN FUNCTION\n");
-
-            console.log("REDIRECTING TO HOME FROM LOGIN FUNCTION\n");
-            return res.redirect(307, "/listing");
-        });
-
     } catch (err) {
-        console.log("CATCH BLOCK STARTED\n");
-        console.log(err);
-
         req.flash("error", err.message);
-        console.log("FLASH MESSAGE SET TO ERROR FROM CATCH BLOCK\n");
-
-        console.log("REDIRECTING TO HOME FROM CATCH BLOCK\n");
-        return res.redirect(307, "/listing");
+        return res.redirect("/listing");
     }
-    console.log("PROGRAM ENDED\n");
-    console.log("LOCALS AT THE END\n");
-    console.log(res.locals);
+
+    if (registeredUser) {
+        req.login(registeredUser, (err) => {
+            if (err) return next(err);
+            req.flash("success", "Welcome to InnQuisitor. Discover your perfect stay with us !");
+            return res.redirect("/listing");
+        });
+    } else {
+        req.flash("error", "Something went wrong. Please try again.");
+        return res.redirect("/listing");
+    }
 };
+
+function autoLogin(user) {
+    console.log("AUTO LOGIN CALLED");
+    console.log(user);
+}
 
 module.exports.renderLoginForm = (req, res) => {
     res.render("users/login");
