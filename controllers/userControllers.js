@@ -107,49 +107,14 @@ module.exports.signup = async (req, res, next) => {
 
 module.exports.verify = async (req, res) => {
 
-    console.log("LOCALS AT START");
-    console.log(res.locals);
-    console.log();
-    console.log("SESSION AT START");
-    console.log(req.session);
-    console.log();
+    console.log("PROGRAM STARTS");
 
     const {token} = req.params;
-    let user, registeredUser;
+    const user = await PendingUser.findOne({verifyToken: token});
 
-    try {
-        user = await PendingUser.findOne({verifyToken: token});
-        if (user.verified) {
-
-            console.log("LOCALS AT START OF VERIFIED BLOCK");
-            console.log(res.locals);
-            console.log();
-            console.log("SESSION AT START OF VERIFIED BLOCK");
-            console.log(req.session);
-            console.log();
-
-            await PendingUser.deleteMany({email: user.email}); 
-
-            console.log("LOCALS AFTER DELETING PENDING USER");
-            console.log(res.locals);
-            console.log();
-            console.log("SESSION AFTER DELETING PENDING USER");
-            console.log(req.session);
-            console.log();
-
-            req.flash("success", "Email verification successful");
-
-            console.log("LOCALS AFTER SETTING FLASH TO SUCCESS IN VERIFIED BLOCK");
-            console.log(res.locals);
-            console.log();
-            console.log("SESSION AFTER SETTING FLASH TO SUCCESS IN VERIFIED BLOCK");
-            console.log(req.session);
-            console.log();
-
-            return res.redirect("/listing");
-        }
-    } catch (err) {
-        req.flash("error", "Token Expired");
+    if (!user) {
+        console.log("IF BLOCK STARTS");
+        req.flash("error", "Verification link expired");
         return res.redirect("/listing");
     }
 
@@ -162,76 +127,17 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
-        console.log("LOCALS AT TRY BLOCK OF REGISTER");
-        console.log(res.locals);
-        console.log();
-        console.log("SESSION AT TRY BLOCK OF REGISTER");
-        console.log(req.session);
-        console.log();
-
-        registeredUser = await User.register(newUser, user.password);
-
-        console.log("LOCALS AFTER USER REGISTER");
-        console.log(res.locals);
-        console.log();
-        console.log("SESSION AFTER USER REGISTER");
-        console.log(req.session);
-        console.log();
-
-        user.verified = true;
-        await user.save();
+        console.log("TRY BLOCK STARTS");
+        await User.register(newUser, user.password);
+        await PendingUser.deleteMany({email: user.email});
+        req.flash("success", "Email verified successfully. You can now log in to your account");
+        res.redirect("/listing");
+        console.log("TRY BLOCK ENDS");
     } catch (err) {
         req.flash("error", err.message);
-        return res.redirect("/listing");
-    }
-
-    req.login(registeredUser, (error) => {
-
-        console.log("LOCALS AT START OF LOGIN FN");
-        console.log(res.locals);
-        console.log();
-        console.log("SESSION AT START OF LOGIN FN");
-        console.log(req.session);
-        console.log();
-
-        if (error) {
-            req.flash("error", error.message);
-            return res.redirect("/listing");
-        }
-
-        console.log("LOCALS BEFORE SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
-        console.log(res.locals);
-        console.log();
-        console.log("SESSION BEFORE SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
-        console.log(req.session);
-        console.log();
-
-        req.flash("success", "Email verification successful");
-
-        console.log("LOCALS AFTER SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
-        console.log(res.locals);
-        console.log();
-        console.log("SESSION AFTER SETTING FLASH MESSAGE TO SUCCESS IN LOGIN FN");
-        console.log(req.session);
-        console.log();
-
         res.redirect("/listing");
-
-        console.log("LOCALS AT THE END OF LOGIN FN");
-        console.log(res.locals);
-        console.log();
-        console.log("SESSION AT THE END OF LOGIN FN");
-        console.log(req.session);
-        console.log();
-    });
-
-    console.log("LOCALS AT THE END OF PROGRAM");
-    console.log(res.locals);
-    console.log();
-    console.log("SESSION AT THE END OF PROGRAM");
-    console.log(req.session);
-    console.log();
-
+    }
+    console.log("PROGRAM ENDS");
 };
 
 module.exports.renderLoginForm = (req, res) => {

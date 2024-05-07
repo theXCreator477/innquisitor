@@ -22,10 +22,6 @@ const pendingUserSchema = new Schema({
         type: Date,
         required: true
     },
-    verified: {
-        type: Boolean,
-        default: false
-    }
 });
 
 pendingUserSchema.index({expiresAt: 1}, {expireAfterSeconds: 0});
