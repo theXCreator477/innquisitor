@@ -138,16 +138,7 @@ module.exports.verify = async (req, res) => {
 
         await PendingUser.deleteMany({ email: user.email });
 
-        req.login(registeredUser, err => {
-            console.log("LOGIN FN STARTED");
-            if (err) {
-                req.flash("error", err.message);
-                return res.redirect("/listing");
-            }
-            req.flash("success", "Email verification successful");
-            console.log("LOGIN FN ENDED");
-            return res.redirect("/listing");
-        });
+        await loginAndRedirect(req, res, registeredUser);
 
     } catch (err) {
         req.flash("error", err.message);
@@ -155,6 +146,19 @@ module.exports.verify = async (req, res) => {
     }
     console.log("PROGRAM STARTED");
 };
+
+async function loginAndRedirect(req, res, user) {
+    req.login(user, err => {
+        console.log("LOGIN FN STARTED");
+        if (err) {
+            req.flash("error", err.message);
+            return res.redirect("/listing");
+        }
+        req.flash("success", "Email verification successful");
+        console.log("LOGIN FN ENDED");
+        return res.redirect("/listing");
+    });
+}
 
 // module.exports.verify = async (req, res) => {
 
