@@ -86,15 +86,19 @@ app.get('/', (req, res) => {
     res.redirect("/listing");
 });
 
+app.get("/error", (req, res) => {
+    res.render("error");
+});
+
 app.use("/listing", listingRoutes);
 app.use("/listing/:id/review", reviewRoutes);
 app.use("/user", userRoutes);
 
-app.all("*", (req, res, next) => {
-   next(new ExpressError(404, "PAGE DOES NOT EXIST"));
+app.use((req, res, next) => {
+    next(new ExpressError(404, "Page not found"));
 });
 
 app.use((err, req, res, next) => {
-    let {status = 500, message = "something went wrong"} = err;
-    res.status(status).send(message);
+    let {status = 500, message = "Something went wrong"} = err;
+    res.status(status).render("error", {status, message});
 });

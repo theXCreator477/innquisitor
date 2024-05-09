@@ -2,6 +2,7 @@ const User = require("../models/userSchema");
 const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const ExpressError = require("../utils/ExpressError");
 
 module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup");
@@ -106,19 +107,20 @@ module.exports.signup = async (req, res, next) => {
 };
 
 module.exports.verify = async (req, res) => {
+    console.log("PROGRAM STARTED");
     const { token } = req.params;
     let user;
     
     try {
         user = await PendingUser.findOne({ verifyToken: token });
-
-        if (user.verified) {
-            await PendingUser.deleteMany({ email: user.email });
-            req.flash("success", "Email verified successfully");
-            return res.redirect("/listing");
-        }
-
     } catch (err) {
+        req.flash("error", err.message);
+        return res.redirect("/listing");
+        
+    }
+
+    if (!user) { 
+        console.log("IF BLOCK STARTED");
         req.flash("error", "Verification link expired");
         return res.redirect("/listing");
     }
@@ -131,16 +133,19 @@ module.exports.verify = async (req, res) => {
     });
 
     try {
+        console.log("TRY BLOCK STARTED");
         const registeredUser = await User.register(newUser, user.password);
 
-        user.verified = true;
-        await user.save();
+        await PendingUser.deleteMany({ email: user.email });
 
         req.login(registeredUser, err => {
+            console.log("LOGIN FN STARTED");
             if (err) {
                 req.flash("error", err.message);
                 return res.redirect("/listing");
             }
+            req.flash("success", "Email verification successful");
+            console.log("LOGIN FN ENDED");
             return res.redirect("/listing");
         });
 
@@ -148,7 +153,47 @@ module.exports.verify = async (req, res) => {
         req.flash("error", err.message);
         return res.redirect("/listing");
     }
+    console.log("PROGRAM STARTED");
 };
+
+// module.exports.verify = async (req, res) => {
+
+//     console.log("PROGRAM STARTED");
+
+//     const { token } = req.params;
+
+//     const user = await PendingUser.findOne({ verifyToken: token });
+
+//     if (!user) {
+//         console.log("IF BLOCK STARTED");
+//         throw new ExpressError(410, "Verification link expired");
+//     }
+
+//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+//     const newUser = new User({
+//     username: user.username,
+//     email: user.email,
+//     profilePic: profilePic,
+//     });
+
+//     const registeredUser = await User.register(newUser, user.password);
+
+//     await PendingUser.deleteMany({ email: user.email });
+
+//     req.login(registeredUser, err => {
+//         console.log("LOGIN FN STARTED");
+//         if (err) {
+//             req.flash("success", "Email verification successful. You can now login to your account");
+//         } else {
+//             req.flash("success", "Email verification successful.");
+//         }
+//         console.log("LOGIN FN ENDED");
+//         return res.redirect("/listing");
+//     });
+
+//     console.log("PROGRAM ENDED");
+
+// };
 
 module.exports.renderLoginForm = (req, res) => {
     res.render("users/login");
