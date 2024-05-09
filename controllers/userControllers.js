@@ -106,24 +106,26 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-module.exports.verify = async (req, res) => {
+module.exports.verify = async (req, res, next) => {
     const {verifyToken} = req.params;
     const user = await User.findOne({verifyToken, isVerified: false});
 
-    if (!user) throw new ExpressError(410, "Verification link expired");
+    if (!user) return next(new ExpressError(410, "Verification link expired"));
 
     user.isVerified = true;
     user.verifyToken = undefined;
     user.expiresAt = undefined;
     await user.save();
 
-    // req.login(user, (err) => {
-    //     if (err) req.flash("success", "Email verification successful. You can now login to your account");
-    //     else req.flash("success", "Email verification successful.");
-    //     res.redirect("/listing");
-    // });
-    req.flash("success", "Email verification successful.");
-    res.redirect("/listing");
+    autoLogin(req, res, user);
+};
+
+const autoLogin = (req, res, user) => {
+    req.login(user, (err) => {
+        if (err) req.flash("success", "Email verification successful. You can now login to your account");
+        else req.flash("success", "Email verification successful.");
+        res.redirect("/listing");
+    });
 };
 
 module.exports.renderLoginForm = (req, res) => {

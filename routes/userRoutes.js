@@ -9,7 +9,7 @@ router.route("/signup")
     .get(UserControllers.renderSignupForm)
     .post(asyncWrap(UserControllers.signup));
 
-router.get("/verify/:verifyToken", asyncWrap(UserControllers.verify));
+router.get("/verify/:verifyToken", UserControllers.verify);
 
 router.route("/login")
     .get(UserControllers.renderLoginForm)
