@@ -153,11 +153,6 @@ module.exports.autoLogin = async (req, res) => {
         console.log("REDIRECTING USER FROM AUTO LOGIN");
         res.redirect("/listing");
     });
-
-    req.flash("success", "Email verification successful");
-    console.log("REDIRECTING USER FROM AUTO LOGIN");
-    res.redirect("/listing");
-    console.log("AUTO LOGIN FN ENDED");
 };
 
 module.exports.renderLoginForm = (req, res) => {
