@@ -106,42 +106,54 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-module.exports.verify = async (req, res) => {
+// module.exports.verify = async (req, res) => {
 
-    console.log("PROGRAM STARTED");
+//     console.log("PROGRAM STARTED");
 
-    const { token } = req.params;
+//     const { token } = req.params;
 
-    const user = await PendingUser.findOne({ verifyToken: token });
+//     const user = await PendingUser.findOne({ verifyToken: token });
 
-    if (!user) {
-        console.log("IF BLOCK STARTED");
-        throw new ExpressError(410, "Verification link expired");
-    }
+//     if (!user) {
+//         console.log("IF BLOCK STARTED");
+//         throw new ExpressError(410, "Verification link expired");
+//     }
 
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-    const newUser = new User({
-    username: user.username,
-    email: user.email,
-    profilePic: profilePic,
-    });
+//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+//     const newUser = new User({
+//     username: user.username,
+//     email: user.email,
+//     profilePic: profilePic,
+//     });
 
-    const registeredUser = await User.register(newUser, user.password);
+//     const registeredUser = await User.register(newUser, user.password);
+//     console.log(registeredUser);
+//     await PendingUser.deleteMany({ email: user.email });
 
-    await PendingUser.deleteMany({ email: user.email });
+//     req.login(registeredUser, (err) => {
+//         console.log("LOGIN FN STARTS");
+//         if (err) {
+//             throw new ExpressError(500, "Something went wrong");
+//         }
+//         req.flash("success", "Email verification successful");
+//         console.log("REDIRECTING USER FROM LOGIN FN");
+//         return res.redirect("/listing");
+//     });
 
-    req.login(registeredUser, (err) => {
-        console.log("LOGIN FN STARTS");
-        if (err) {
-            throw new ExpressError(500, "Something went wrong");
-        }
+//     console.log("PROGRAM ENDED");
+
+// };
+
+module.exports.autoLogin = async (req, res) => {
+    console.log("ENTERED AUTO LOGIN FN");
+    req.login(req.session.registeredUser, (err) => {
+        console.log("AUTO LOGIN STARTED");
+        if (err) next(err);
         req.flash("success", "Email verification successful");
-        console.log("REDIRECTING USER FROM LOGIN FN");
-        return res.redirect("/listing");
+        console.log("REDIRECTING USER FROM AUTO LOGIN");
+        res.redirect("/listing");
     });
-
-    console.log("PROGRAM ENDED");
-
+    console.log("AUTO LOGIN FN ENDED");
 };
 
 module.exports.renderLoginForm = (req, res) => {

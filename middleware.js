@@ -1,6 +1,8 @@
 const Listing = require("./models/listingSchema");
 const {reviewSchema, listingSchema} = require("./schemaValidation");
 const User = require("./models/userSchema");
+const PendingUser = require("./models/pendingUserSchema");
+const ExpressError = require("./utils/ExpressError");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -58,4 +60,39 @@ module.exports.validateToken = async (req, res, next) => {
         return res.redirect("/listing");
     }
     next();
+};
+
+module.exports.verifyToken = async (req, res, next) => {
+    console.log("VERIFY TOKEN MIDDLEWARE STARTED");
+    let {token} = req.params;
+    try {
+        const pendingUser = await PendingUser.findOne({verifyToken: token});
+        if (!pendingUser) {
+            console.log("IF BLOCK STARTED");
+            throw new ExpressError(410, "Verification link expired");
+        }
+        req.session.pendingUser = pendingUser;
+        console.log("JUMPING TO NEXT MIDDLEWARE FROM VERIFY");
+        next();
+    } catch (err) {
+        next(err);
+    }
+    console.log("VERIFY TOKEN MIDDLEWARE ENDED");
+};
+
+module.exports.registerUser = async (req, res, next) => {
+    console.log("REGISTER MIDDLEWARE STARTED");
+    const {username, email, password} = req.session.pendingUser;
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    const newUser = new User({username, email, profilePic});
+    try {
+        const registeredUser = await User.register(newUser, password);
+        req.session.pendingUser = undefined;
+        req.session.registeredUser = registeredUser;
+        console.log("JUMPING TO NEXT MIDDLEWARE FROM REGISTER");
+        next();
+    } catch (err) {
+        next(err);
+    }
+    console.log("REGISTER MIDDLEWARE ENDED");
 };
