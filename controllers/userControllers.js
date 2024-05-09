@@ -132,7 +132,6 @@ module.exports.verify = async (req, res) => {
     req.login(registeredUser, (err) => {
         if (err) throw new ExpressError(500, "Something went wrong");
 
-        req.flash("success", "Email verification successful");
         res.redirect("/listing");
     });
 };
