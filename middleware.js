@@ -87,9 +87,9 @@ module.exports.registerUser = async (req, res, next) => {
     const profilePic = `/assets/Images/pic-1.avif`;
     const newUser = new User({username, email, profilePic});
     try {
-        const registeredUser = await User.register(newUser, password);
+        // const registeredUser = await User.register(newUser, password);
         req.session.pendingUser = undefined;
-        req.session.registeredUser = registeredUser;
+        // req.session.registeredUser = registeredUser;
         console.log("JUMPING TO NEXT MIDDLEWARE FROM REGISTER");
         next();
     } catch (err) {

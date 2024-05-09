@@ -42,8 +42,8 @@ module.exports.signup = async (req, res, next) => {
     try {
         const verifyToken = crypto.randomBytes(16).toString("hex");
 
-        const user = new PendingUser({ username, email, password, verifyToken, expiresAt: Date.now() + 30 * 60 * 1000 });
-        await user.save();
+        const user = new PendingUser({ username, email, verifyToken, expiresAt: Date.now() + 30 * 60 * 1000 });
+        await PendingUser.register(user, password);
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const passportLocalMongoose = require("passport-local-mongoose");
 const Schema = mongoose.Schema;
 
 const pendingUserSchema = new Schema({
@@ -10,10 +11,8 @@ const pendingUserSchema = new Schema({
         type: String,
         required: true
     },
-    password: {
-        type: String,
-        required: true,
-    },
+    salt: String,
+    hash: String,
     verifyToken: {
         type: String,
         required: true
@@ -26,9 +25,15 @@ const pendingUserSchema = new Schema({
         type: Boolean,
         default: false
     }
+}, {
+    toObject: {
+      virtuals: true
+    }
 });
 
 pendingUserSchema.index({expiresAt: 1}, {expireAfterSeconds: 0});
+
+pendingUserSchema.plugin(passportLocalMongoose);
 
 const PendingUser = mongoose.model("PendingUser", pendingUserSchema);
 

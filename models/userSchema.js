@@ -20,6 +20,8 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    hash: String,
+    salt: String,
     resetToken: String,
     resetTokenExpiration: Date,
     reqToken: String,
