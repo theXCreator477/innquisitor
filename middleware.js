@@ -83,7 +83,8 @@ module.exports.verifyToken = async (req, res, next) => {
 module.exports.registerUser = async (req, res, next) => {
     console.log("REGISTER MIDDLEWARE STARTED");
     const {username, email, password} = req.session.pendingUser;
-    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    // const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    const profilePic = `/assets/Images/pic-1.avif`;
     const newUser = new User({username, email, profilePic});
     try {
         const registeredUser = await User.register(newUser, password);

@@ -146,13 +146,17 @@ module.exports.signup = async (req, res, next) => {
 
 module.exports.autoLogin = async (req, res) => {
     console.log("ENTERED AUTO LOGIN FN");
-    req.login(req.session.registeredUser, (err) => {
-        console.log("AUTO LOGIN STARTED");
-        if (err) next(err);
-        req.flash("success", "Email verification successful");
-        console.log("REDIRECTING USER FROM AUTO LOGIN");
-        res.redirect("/listing");
-    });
+    // req.login(req.session.registeredUser, (err) => {
+    //     console.log("AUTO LOGIN STARTED");
+    //     if (err) next(err);
+    //     req.flash("success", "Email verification successful");
+    //     console.log("REDIRECTING USER FROM AUTO LOGIN");
+    //     res.redirect("/listing");
+    // });
+
+    req.flash("success", "Email verification successful");
+    console.log("REDIRECTING USER FROM AUTO LOGIN");
+    res.redirect("/listing");
     console.log("AUTO LOGIN FN ENDED");
 };
 
