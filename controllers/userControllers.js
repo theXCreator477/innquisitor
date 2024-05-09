@@ -1,5 +1,4 @@
 const User = require("../models/userSchema");
-const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const ExpressError = require("../utils/ExpressError");
@@ -41,9 +40,10 @@ module.exports.signup = async (req, res, next) => {
 
     try {
         const verifyToken = crypto.randomBytes(16).toString("hex");
+        const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
 
-        const user = new PendingUser({ username, email, verifyToken, expiresAt: Date.now() + 30 * 60 * 1000 });
-        await PendingUser.register(user, password);
+        const user = new User({ username, email, profilePic, verifyToken, expiresAt: Date.now() + 3 * 60 * 1000 });
+        await User.register(user, password);
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -106,51 +106,20 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-// module.exports.verify = async (req, res) => {
+module.exports.verify = async (req, res) => {
+    const {verifyToken} = req.params;
+    const user = await User.findOne({verifyToken, isVerified: false});
 
-//     console.log("PROGRAM STARTED");
+    if (!user) throw new ExpressError(410, "Verification link expired");
 
-//     const { token } = req.params;
+    user.isVerified = true;
+    user.verifyToken = undefined;
+    user.expiresAt = undefined;
+    await user.save();
 
-//     const user = await PendingUser.findOne({ verifyToken: token });
-
-//     if (!user) {
-//         console.log("IF BLOCK STARTED");
-//         throw new ExpressError(410, "Verification link expired");
-//     }
-
-//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-//     const newUser = new User({
-//     username: user.username,
-//     email: user.email,
-//     profilePic: profilePic,
-//     });
-
-//     const registeredUser = await User.register(newUser, user.password);
-//     console.log(registeredUser);
-//     await PendingUser.deleteMany({ email: user.email });
-
-//     req.login(registeredUser, (err) => {
-//         console.log("LOGIN FN STARTS");
-//         if (err) {
-//             throw new ExpressError(500, "Something went wrong");
-//         }
-//         req.flash("success", "Email verification successful");
-//         console.log("REDIRECTING USER FROM LOGIN FN");
-//         return res.redirect("/listing");
-//     });
-
-//     console.log("PROGRAM ENDED");
-
-// };
-
-module.exports.autoLogin = async (req, res) => {
-    console.log("ENTERED AUTO LOGIN FN");
-    req.login(req.session.registeredUser, (err) => {
-        console.log("AUTO LOGIN STARTED");
-        if (err) next(err);
-        req.flash("success", "Email verification successful");
-        console.log("REDIRECTING USER FROM AUTO LOGIN");
+    req.login(user, (err) => {
+        if (err) req.flash("success", "Email verification successful. You can now login to your account");
+        else req.flash("success", "Email verification successful.");
         res.redirect("/listing");
     });
 };
