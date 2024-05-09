@@ -117,11 +117,13 @@ module.exports.verify = async (req, res) => {
     user.expiresAt = undefined;
     await user.save();
 
-    req.login(user, (err) => {
-        if (err) req.flash("success", "Email verification successful. You can now login to your account");
-        else req.flash("success", "Email verification successful.");
-        res.redirect("/listing");
-    });
+    // req.login(user, (err) => {
+    //     if (err) req.flash("success", "Email verification successful. You can now login to your account");
+    //     else req.flash("success", "Email verification successful.");
+    //     res.redirect("/listing");
+    // });
+    req.flash("success", "Email verification successful.");
+    res.redirect("/listing");
 };
 
 module.exports.renderLoginForm = (req, res) => {
