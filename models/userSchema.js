@@ -20,12 +20,6 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    verifyToken: String,
-    isVerified: {
-        type: Boolean,
-        default: false
-    },
-    expiresAt: Date,
     resetToken: String,
     resetTokenExpiration: Date,
     reqToken: String,
@@ -50,8 +44,6 @@ userSchema.methods.generateReqToken = function () {
     this.reqTokenExpiration = Date.now() + (24 * 60 * 60 * 1000); // expires in 24 hours
     return this.reqToken;
 };
-
-userSchema.index({expiresAt: 1}, {expireAfterSeconds: 0});
 
 userSchema.plugin(passportLocalMongoose);
 

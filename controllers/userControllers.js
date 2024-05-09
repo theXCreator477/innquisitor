@@ -1,4 +1,5 @@
 const User = require("../models/userSchema");
+const PendingUser = require("../models/pendingUserSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const ExpressError = require("../utils/ExpressError");
@@ -40,10 +41,9 @@ module.exports.signup = async (req, res, next) => {
 
     try {
         const verifyToken = crypto.randomBytes(16).toString("hex");
-        const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
 
-        const user = new User({ username, email, profilePic, verifyToken, expiresAt: Date.now() + 3 * 60 * 1000 });
-        await User.register(user, password);
+        const user = new PendingUser({ username, email, password, verifyToken});
+        await user.save();
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -106,24 +106,33 @@ module.exports.signup = async (req, res, next) => {
     }
 };
 
-module.exports.verify = async (req, res, next) => {
+module.exports.verify = async (req, res) => {
     const {verifyToken} = req.params;
-    const user = await User.findOne({verifyToken, isVerified: false});
+    const pendingUser = await PendingUser.findOne({verifyToken});
 
-    if (!user) return next(new ExpressError(410, "Verification link expired"));
+    try {
+        if (pendingUser.isVerified) {
+        
+            await PendingUser.deleteMany({ email: pendingUser.email });
+    
+            req.flash("success", "Email verification successful");
+            return res.redirect("/listing");
+        }
+    } catch (err) { throw new ExpressError(410, "Verification link expired") };
 
-    user.isVerified = true;
-    user.verifyToken = undefined;
-    user.expiresAt = undefined;
-    await user.save();
+    const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
+    const {username, email, password} = pendingUser;
 
-    autoLogin(req, res, user);
-};
+    const newUser = new User({ username, email, profilePic});
 
-const autoLogin = (req, res, user) => {
-    req.login(user, (err) => {
-        if (err) req.flash("success", "Email verification successful. You can now login to your account");
-        else req.flash("success", "Email verification successful.");
+    const registeredUser = await User.register(newUser, password);
+    pendingUser.isVerified = true;
+    await pendingUser.save();
+
+    req.login(registeredUser, (err) => {
+        if (err) throw new ExpressError(500, "Something went wrong");
+
+        req.flash("success", "Email verification successful");
         res.redirect("/listing");
     });
 };
