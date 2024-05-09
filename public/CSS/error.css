@@ -4,13 +4,26 @@
     align-items: center;
     gap: 1rem;
     margin-top: 4rem;
+    opacity: 0.8;
 
     * {
         margin: 0;
         padding: 0;
     }
 
-    > i {
+    .error-emo {
         font-size: 4rem;
+    }
+
+    .fa-house {
+        color: black;
+        font-size: 1.5rem;
+        padding: 1rem 0.9rem;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+    .fa-house:hover {
+        background-color: rgba(128, 128, 128, 0.25);
     }
 }

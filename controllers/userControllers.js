@@ -107,97 +107,43 @@ module.exports.signup = async (req, res, next) => {
 };
 
 module.exports.verify = async (req, res) => {
-    console.log("PROGRAM STARTED");
-    const { token } = req.params;
-    let user;
-    
-    try {
-        user = await PendingUser.findOne({ verifyToken: token });
-    } catch (err) {
-        req.flash("error", err.message);
-        return res.redirect("/listing");
-        
-    }
 
-    if (!user) { 
+    console.log("PROGRAM STARTED");
+
+    const { token } = req.params;
+
+    const user = await PendingUser.findOne({ verifyToken: token });
+
+    if (!user) {
         console.log("IF BLOCK STARTED");
-        req.flash("error", "Verification link expired");
-        return res.redirect("/listing");
+        throw new ExpressError(410, "Verification link expired");
     }
 
     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
     const newUser = new User({
-        username: user.username,
-        email: user.email,
-        profilePic: profilePic,
+    username: user.username,
+    email: user.email,
+    profilePic: profilePic,
     });
 
-    try {
-        console.log("TRY BLOCK STARTED");
-        const registeredUser = await User.register(newUser, user.password);
+    const registeredUser = await User.register(newUser, user.password);
 
-        await PendingUser.deleteMany({ email: user.email });
+    await PendingUser.deleteMany({ email: user.email });
 
-        await loginAndRedirect(req, res, registeredUser);
-
-    } catch (err) {
-        req.flash("error", err.message);
-        return res.redirect("/listing");
-    }
-    console.log("PROGRAM STARTED");
-};
-
-async function loginAndRedirect(req, res, user) {
-    req.login(user, err => {
+    await req.login(registeredUser, err => {
         console.log("LOGIN FN STARTED");
         if (err) {
-            req.flash("error", err.message);
-            return res.redirect("/listing");
+            req.flash("success", "Email verification successful. You can now login to your account");
+        } else {
+            req.flash("success", "Email verification successful.");
         }
-        req.flash("success", "Email verification successful");
         console.log("LOGIN FN ENDED");
         return res.redirect("/listing");
     });
-}
 
-// module.exports.verify = async (req, res) => {
+    console.log("PROGRAM ENDED");
 
-//     console.log("PROGRAM STARTED");
-
-//     const { token } = req.params;
-
-//     const user = await PendingUser.findOne({ verifyToken: token });
-
-//     if (!user) {
-//         console.log("IF BLOCK STARTED");
-//         throw new ExpressError(410, "Verification link expired");
-//     }
-
-//     const profilePic = `/assets/Images/pic-${Math.floor(Math.random() * 5 + 1)}.avif`;
-//     const newUser = new User({
-//     username: user.username,
-//     email: user.email,
-//     profilePic: profilePic,
-//     });
-
-//     const registeredUser = await User.register(newUser, user.password);
-
-//     await PendingUser.deleteMany({ email: user.email });
-
-//     req.login(registeredUser, err => {
-//         console.log("LOGIN FN STARTED");
-//         if (err) {
-//             req.flash("success", "Email verification successful. You can now login to your account");
-//         } else {
-//             req.flash("success", "Email verification successful.");
-//         }
-//         console.log("LOGIN FN ENDED");
-//         return res.redirect("/listing");
-//     });
-
-//     console.log("PROGRAM ENDED");
-
-// };
+};
 
 module.exports.renderLoginForm = (req, res) => {
     res.render("users/login");
