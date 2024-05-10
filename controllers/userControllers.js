@@ -266,9 +266,9 @@ module.exports.submitReset = async (req, res) => {
 
     await User.findByIdAndDelete(user._id);
 
-    const {_id, username, email, profilePic} = user;
+    const {_id, username, email, profilePic, reservations} = user;
 
-    let newUser = new User({_id, username, email, profilePic});
+    let newUser = new User({_id, username, email, profilePic, reservations});
 
     const registeredUser = await User.register(newUser, create);
 
