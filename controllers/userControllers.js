@@ -276,7 +276,7 @@ module.exports.submitReset = async (req, res) => {
         if (err) throw new ExpressError();
         else {
             req.flash("success", "Password reset successful");
-            res.redirect("/user/login");
+            res.redirect("/listing");
         }
     });
 };
