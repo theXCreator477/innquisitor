@@ -1,6 +1,7 @@
 const Listing = require("./models/listingSchema");
 const {reviewSchema, listingSchema} = require("./schemaValidation");
 const User = require("./models/userSchema");
+const ExpressError = require("./utils/ExpressError");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -54,8 +55,7 @@ module.exports.validateToken = async (req, res, next) => {
     const user = await User.findOne({reqToken, reqTokenExpiration: {$gt: Date.now()}});
 
     if (!user) {
-        req.flash("error", "Token Expired");
-        return res.redirect("/listing");
+        next(new ExpressError(410, "Request token expired"));
     }
     next();
 };

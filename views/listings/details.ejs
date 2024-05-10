@@ -37,7 +37,7 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                     </a>
-                    <form method="POST" action="/listing/<%=data._id%>?_method=DELETE">
+                    <form id="" method="POST" action="/listing/<%=data._id%>?_method=DELETE">
                         <button id="delete-btn" type="submit" class="submit-btn edit-delete-btn">
                             Delete
                             <i class="fa-solid fa-trash"></i>
@@ -148,7 +148,7 @@
                         <p class="username medium m-0"><%= review.owner.username %></p>
                     </div>
                     <% if (currentUser) { %>
-                        <form method="POST" action="/listing/<%=data._id%>/review/<%=review._id%>?_method=DELETE">
+                        <form id="" method="POST" action="/listing/<%=data._id%>/review/<%=review._id%>?_method=DELETE">
                             <button type="submit" class="">
                                 <i id="delete-review" class="fa-solid fa-trash"></i>
                             </button>

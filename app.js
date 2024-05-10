@@ -70,8 +70,6 @@ main()
     .then(() => console.log("Connected to MongoDB Successfully"))
     .catch((err) => console.error(err));
 
-
-
 app.use((req, res, next) => {
     res.locals = {
         success: req.flash("success"),
@@ -81,13 +79,8 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.get('/', (req, res) => {
     res.redirect("/listing");
-});
-
-app.get("/error", (req, res) => {
-    res.render("error");
 });
 
 app.use("/listing", listingRoutes);

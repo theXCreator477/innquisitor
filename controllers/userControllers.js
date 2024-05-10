@@ -8,14 +8,13 @@ module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup");
 };
 
-module.exports.signup = async (req, res, next) => {
+module.exports.signup = async (req, res) => {
     let { username, email, password } = req.body;
     const regexp = new RegExp('^[a-zA-Z0-9]+(\\s[a-zA-Z0-9]+)?$');
 
     if (!email || !username || !password) {
         req.flash('error', 'All fields are required');
-        res.redirect('/signup');
-        return;
+        return res.redirect('/signup');
     }
 
     username = username.trim();
@@ -29,81 +28,73 @@ module.exports.signup = async (req, res, next) => {
     let existingUser = await User.findOne({ username });
     if (existingUser) {
         req.flash('error', 'This username is not available');
-        res.redirect('/user/signup');
-        return;
+        return res.redirect('/user/signup');
     }
     existingUser = await User.findOne({ email });
     if (existingUser) {
         req.flash('error', 'Email address already in use');
-        res.redirect('/user/signup');
-        return;
+        return res.redirect('/user/signup');
     }
 
-    try {
-        const verifyToken = crypto.randomBytes(16).toString("hex");
+    const verifyToken = crypto.randomBytes(16).toString("hex");
 
-        const user = new PendingUser({ username, email, password, verifyToken});
-        await user.save();
+    const user = new PendingUser({ username, email, password, verifyToken});
+    await user.save();
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.GMAIL_APP_USER,
-                pass: process.env.GMAIL_APP_PASS
-            }
-        });
-
-        const mailOptions = {
-            from: {
-                name: 'InnQuisitor',
-                address: process.env.GMAIL_APP_USER
-            },
-            to: email,
-            subject: `Welcome ${username}, Discover Your Perfect Stay with InnQuisitor`,
-            html: `<body>
-                        <table cellpadding="0" cellspacing="0" style="width: 80vw; max-width: 500px; background-color: #F7F7F7; margin: auto; border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 1rem; padding: 1rem;">
-                            <tr>
-                                <td align="center" style="padding: 0.25rem;">
-                                    <img src="https://res.cloudinary.com/dhqqljnt3/image/upload/v1714725885/20240418_203344_ue48dt.png"
-                                        height="80" style="height: 80px;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p>
-                                        Dear ${username},<br><br>
-                                        We are delighted to welcome you to InnQuisitor, the premier hotel booking platform for discerning travelers. Our tagline, "Discover Your Perfect Stay," is not just a slogan, it's a promise we make to every one of our valued users.<br><br>Our platform is designed to provide you with a seamless and intuitive booking experience, so you can focus on what matters most - creating unforgettable memories.
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center">
-                                    <button type="button"
-                                        style="border: none; border-radius: 0.5rem; background-color: #FF385C; padding: 0.75rem 1.5rem; font-size: 1rem; margin: 0.5rem auto;">
-                                        <a href="${req.protocol}://${req.headers.host}/user/verify/${verifyToken}" style="text-decoration: none; color: white;">Verify Email</a>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p>
-                                        Link is valid for 30 minutes.<br><br>Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </body>`,
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.GMAIL_APP_USER,
+            pass: process.env.GMAIL_APP_PASS
         }
+    });
 
-        await transporter.sendMail(mailOptions);
-
-        req.flash("success", "A verification email has been sent to your email address. Please click the link to activate your account");
-        res.redirect("/listing");
-
-    } catch (err) {
-        req.flash("error", err.message);
-        res.redirect("/listing");
+    const mailOptions = {
+        from: {
+            name: 'InnQuisitor',
+            address: process.env.GMAIL_APP_USER
+        },
+        to: email,
+        subject: `Welcome ${username}, Discover Your Perfect Stay with InnQuisitor`,
+        html: `<body>
+                    <table cellpadding="0" cellspacing="0" style="width: 80vw; max-width: 500px; background-color: #F7F7F7; margin: auto; border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 1rem; padding: 1rem;">
+                        <tr>
+                            <td align="center" style="padding: 0.25rem;">
+                                <img src="https://res.cloudinary.com/dhqqljnt3/image/upload/v1714725885/20240418_203344_ue48dt.png"
+                                    height="80" style="height: 80px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>
+                                    Dear ${username},<br><br>
+                                    We are delighted to welcome you to InnQuisitor, the premier hotel booking platform for discerning travelers. Our tagline, "Discover Your Perfect Stay," is not just a slogan, it's a promise we make to every one of our valued users.<br><br>Our platform is designed to provide you with a seamless and intuitive booking experience, so you can focus on what matters most - creating unforgettable memories.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <button type="button"
+                                    style="border: none; border-radius: 0.5rem; background-color: #FF385C; padding: 0.75rem 1.5rem; font-size: 1rem; margin: 0.5rem auto;">
+                                    <a href="${req.protocol}://${req.headers.host}/user/verify/${verifyToken}" style="text-decoration: none; color: white;">Verify Email</a>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p>
+                                    Link is valid for 30 minutes.<br><br>Thank you for choosing InnQuisitor, and we look forward to helping you discover your perfect stay.<br><br>Best regards,<br>InnQuisitor Team
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </body>`,
     }
+
+    await transporter.sendMail(mailOptions);
+
+    req.flash("success", "A verification email has been sent to your email address. Please click the link to activate your account");
+    res.redirect("/listing");
 };
 
 module.exports.verify = async (req, res) => {
@@ -131,8 +122,7 @@ module.exports.verify = async (req, res) => {
 
     req.login(registeredUser, (err) => {
         if (err) throw new ExpressError(500, "Something went wrong");
-
-        res.redirect("/listing");
+        else res.redirect("/listing");
     });
 };
 
@@ -153,7 +143,6 @@ module.exports.logout = (req, res, next) => {
         if (err) return next(err);
         else {
             req.flash("success", "Logged Out Successfully");
-            console.log(req.session);
             res.redirect("/listing");
         }
     });
@@ -169,8 +158,7 @@ module.exports.submitForgot = async (req, res) => {
     let { userInfo } = req.body;
     if (!userInfo) {
         req.flash("error", "The field is requierd");
-        res.redirect("/user/forgot");
-        return;
+        return res.redirect("/user/forgot");
     }
 
     userInfo = userInfo.trim();
@@ -180,8 +168,7 @@ module.exports.submitForgot = async (req, res) => {
 
     if (!user) {
         req.flash("error", "credentials do not match our records.");
-        res.redirect("/user/forgot");
-        return;
+        return res.redirect("/user/forgot");
     }
 
     const resetToken = user.generateResetToken();
@@ -242,34 +229,19 @@ module.exports.submitForgot = async (req, res) => {
                 </body>`
     }
 
-    try {
-        await transporter.sendMail(mailOptions);
-        req.flash("success", "A password reset email has been sent to your email address.");
-        res.redirect("/user/login");
-    } catch (err) {
-        req.flash("error", err.message);
-        res.redirect("/user/forgot");
-    }
-
+    await transporter.sendMail(mailOptions);
+    req.flash("success", "A password reset email has been sent to your email address.");
+    res.redirect("/listing");
 };
 
 //To get the new password page
 module.exports.renderReset = async (req, res) => {
     const { resetToken } = req.params;
-    try {
-        const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
+    const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
 
-        if (!user) {
-            req.flash("error", "Token Expired");
-            res.redirect("/user/forgot");
-            return;
-        }
+    if (!user) throw new ExpressError(410, "Reset token expired");
 
-        res.render("users/reset", { resetToken });
-    } catch (err) {
-        req.flash("error", err.message);
-        res.redirect("/user/forgot");
-    }
+    res.render("users/reset", { resetToken });
 };
 
 //To submit the new password
@@ -283,46 +255,33 @@ module.exports.submitReset = async (req, res) => {
         return;
     }
 
-    if (create === confirm) {
-        try {
-            const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
-
-            if (!user) {
-                req.flash("error", "Token Expired");
-                res.redirect("/user/forgot");
-                return;
-            }
-
-            try {
-                await User.findByIdAndDelete(user._id);
-
-                let newUser = new User({
-                    _id: user._id,
-                    username: user.username,
-                    email: user.email,
-                    profilePic: user.profilePic
-                });
-
-                await User.register(newUser, create);
-
-                req.flash("success", "Password reset successfully");
-                res.redirect("/user/login");
-            } catch (err) {
-                req.flash("error", err.message);
-                res.redirect("/user/forgot");
-            }
-        } catch (err) {
-            req.flash("error", err.message);
-            res.redirect("/user/forgot");
-        }
-
-    } else {
+    if (create !== confirm) {
         req.flash("error", "Passwords do not match");
-        res.redirect(`/user/reset/${resetToken}`);
+        return res.redirect(`/user/reset/${resetToken}`);
     }
+
+    const user = await User.findOne({ resetToken, resetTokenExpiration: { $gt: Date.now() } });
+
+    if (!user) throw new ExpressError(410, "Reset token expired");
+
+    await User.findByIdAndDelete(user._id);
+
+    const {_id, username, email, profilePic} = user;
+
+    let newUser = new User({_id, username, email, profilePic});
+
+    const registeredUser = await User.register(newUser, create);
+
+    req.login(registeredUser, err => {
+        if (err) throw new ExpressError();
+        else {
+            req.flash("success", "Password reset successful");
+            res.redirect("/user/login");
+        }
+    });
 };
 
 module.exports.renderBookings = async (req, res) => {
     const user = await req.user.populate({ path: "reservations", populate: { path: "listing" } });
     res.render("listings/bookings", { user });
-}
+};

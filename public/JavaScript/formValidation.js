@@ -30,19 +30,21 @@ try {
     }
   });
 
-} catch (err) {}
+} catch (err) { }
 
 
 try {
-  document.getElementById('add-new').addEventListener('submit', event => {
-    let selected = document.querySelector('.categories-container input:checked');
+  let form = document.getElementById('add-new');
+
+  form.addEventListener('submit', event => {
+    let selected = form.querySelector('.categories-container input:checked');
     if (!selected) {
       event.preventDefault();
-      document.querySelector('.category-feedback').style.display = "block";
+      return document.querySelector('.category-feedback').style.display = "block";
     }
   });
 
-} catch (err) {}
+} catch (err) { }
 
 
 try {
@@ -67,4 +69,4 @@ try {
     }
   });
 
-} catch (err) {}
+} catch (err) { }

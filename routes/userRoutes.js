@@ -15,15 +15,15 @@ router.route("/login")
     .get(UserControllers.renderLoginForm)
     .post(saveRedirectInfo, passport.authenticate("local", {failureRedirect: "/user/login", failureFlash: true}), UserControllers.login);
 
+router.get("/logout", isLoggedIn, UserControllers.logout);
+
 router.route("/forgot")
     .get(UserControllers.renderForgot)
     .post(asyncWrap(UserControllers.submitForgot));
 
 router.route("/reset/:resetToken")
-    .get(UserControllers.renderReset)
-    .post(UserControllers.submitReset);
-
-router.get("/logout", isLoggedIn, UserControllers.logout);
+    .get(asyncWrap(UserControllers.renderReset))
+    .post(asyncWrap(UserControllers.submitReset));
 
 router.get("/bookings", isLoggedIn, asyncWrap(UserControllers.renderBookings));
 
